@@ -22,4 +22,3 @@ $ emaint sync -r bes
 - sys-apps/busybox: extra use flag for all suppressed commands in base gentoo (beep, inetd, ipcalc, inotifyd, rfkill, ...)
 - sys-cluster/csync2
 
-
