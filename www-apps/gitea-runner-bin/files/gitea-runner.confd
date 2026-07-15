@@ -1,0 +1,9 @@
+# /etc/conf.d/gitea-runner
+# Configuration for Gitea Actions Runner
+
+# User under which the runner will run
+# Must have access to Docker socket
+GIT_USER="git"
+
+# Additional options can be added here
+# GITEA_RUNNER_OPTS=""

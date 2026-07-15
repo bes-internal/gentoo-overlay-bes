@@ -1,0 +1,57 @@
+#!/sbin/openrc-run
+# Copyright 1999-2024 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+name="gitea-runner"
+description="Gitea Actions self-hosted runner"
+
+# Read configuration from conf.d
+GIT_USER="${GIT_USER:-git}"
+
+command="/usr/bin/gitea-runner"
+command_args="--config /etc/gitea/gitea-runner-config.yaml daemon"
+command_background=false
+pidfile="/run/${RC_SVCNAME}.pid"
+logfile="/var/log/gitea-runner/${RC_SVCNAME}.log"
+
+depend() {
+	need net docker
+}
+
+start_pre() {
+	checkpath -f -m 0755 -o ${GIT_USER}:${GIT_USER} "$pidfile"
+	checkpath -f -m 0644 -o ${GIT_USER}:${GIT_USER} "$logfile"
+	checkpath -d -m 0755 -o ${GIT_USER}:${GIT_USER} /var/lib/gitea
+
+	# Wait for Docker socket
+	ebegin "Waiting for Docker daemon"
+	while [ ! -S /var/run/docker.sock ]; do
+		sleep 1
+	done
+	eend 0
+}
+
+start() {
+	ebegin "Starting $name"
+	start-stop-daemon --start \
+		--chdir "/var/lib/gitea" \
+		--exec "$command" \
+		--user ${GIT_USER} \
+		--pidfile "$pidfile" \
+		--make-pidfile \
+		--background \
+		--stdout "$logfile" \
+		--stderr "$logfile" \
+		--wait 10 \
+		-- $command_args
+	eend $? "Failed to start $name"
+}
+
+stop() {
+	ebegin "Stopping $name"
+	start-stop-daemon --stop \
+		--exec "$command" \
+		--retry TERM/5/KILL/10 \
+		--pidfile "$pidfile"
+	eend $? "Failed to stop $name"
+}
