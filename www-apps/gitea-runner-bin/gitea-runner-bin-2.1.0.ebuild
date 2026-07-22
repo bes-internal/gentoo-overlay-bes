@@ -9,12 +9,12 @@ DESCRIPTION="Gitea Actions runner binary"
 HOMEPAGE="https://gitea.com/gitea/runner/"
 
 SRC_URI="
-	amd64? ( https://gitea.com/gitea/runner/releases/download/v${MY_PV}/gitea-runner-${MY_PV}-linux-amd64.xz -> ${P}-linux-amd64.xz )
-	arm? ( https://gitea.com/gitea/runner/releases/download/v${MY_PV}/gitea-runner-${MY_PV}-linux-arm-7.xz -> ${P}-linux-arm-7.xz )
-	arm64? ( https://gitea.com/gitea/runner/releases/download/v${MY_PV}/gitea-runner-${MY_PV}-linux-arm64.xz -> ${P}-linux-arm64.xz )
-	loong? ( https://gitea.com/gitea/runner/releases/download/v${MY_PV}/gitea-runner-${MY_PV}-linux-loong64.xz -> ${P}-linux-loong64.xz )
-	riscv? ( https://gitea.com/gitea/runner/releases/download/v${MY_PV}/gitea-runner-${MY_PV}-linux-riscv64.xz -> ${P}-linux-riscv64.xz )
-	s390? ( https://gitea.com/gitea/runner/releases/download/v${MY_PV}/gitea-runner-${MY_PV}-linux-s390x.xz -> ${P}-linux-s390x.xz )
+	amd64? ( https://gitea.com/gitea/runner/releases/download/v${PV}/gitea-runner-${PV}-linux-amd64.xz -> ${P}-linux-amd64.xz )
+	arm? ( https://gitea.com/gitea/runner/releases/download/v${PV}/gitea-runner-${PV}-linux-arm-7.xz -> ${P}-linux-arm-7.xz )
+	arm64? ( https://gitea.com/gitea/runner/releases/download/v${PV}/gitea-runner-${PV}-linux-arm64.xz -> ${P}-linux-arm64.xz )
+	loong? ( https://gitea.com/gitea/runner/releases/download/v${PV}/gitea-runner-${PV}-linux-loong64.xz -> ${P}-linux-loong64.xz )
+	riscv? ( https://gitea.com/gitea/runner/releases/download/v${PV}/gitea-runner-${PV}-linux-riscv64.xz -> ${P}-linux-riscv64.xz )
+	s390? ( https://gitea.com/gitea/runner/releases/download/v${PV}/gitea-runner-${PV}-linux-s390x.xz -> ${P}-linux-s390x.xz )
 "
 
 LICENSE="MIT"
