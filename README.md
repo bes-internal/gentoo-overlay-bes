@@ -21,4 +21,5 @@ $ emaint sync -r bes
 
 - sys-apps/busybox: extra use flag for all suppressed commands in base gentoo (beep, inetd, ipcalc, inotifyd, rfkill, ...)
 - sys-cluster/csync2
-
+- dev-util/diffr: Diff tool with colorized word-level highlighting inside changed lines
+- www-apps/gitea-runner-bin 
