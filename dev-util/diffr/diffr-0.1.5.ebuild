@@ -12,7 +12,7 @@ SRC_URI="https://github.com/mookid/diffr/archive/refs/tags/v${PV}.tar.gz -> ${P}
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
+KEYWORDS="amd64 arm64"
 
 # Добавляем termion и её зависимости
 CRATES="
