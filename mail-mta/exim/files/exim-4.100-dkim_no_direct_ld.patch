@@ -1,0 +1,11 @@
+--- a/src/miscmods/Makefile	2026-08-20 11:39:08.000000000 +0300
++++ b/src/miscmods/Makefile	2026-08-21 20:00:40.942683982 +0300
+@@ -67,7 +67,7 @@
+ 	$(FE)$(CC) -c $(CFLAGS) $(INCLUDE) pdkim.c
+ 	$(FE)$(CC) -c $(CFLAGS) $(INCLUDE) $(TLS_INCLUDE) signing.c
+ 	$(FE)mv dkim.o dkim_tmp.o
+-	$(FE)$(LD) -r -o dkim.o $(LDFLAGS_PARTIAL) \
++	$(FE)$(CC) -r -o dkim.o $(LDFLAGS_PARTIAL) \
+ 		dkim_tmp.o dkim_transport.o pdkim.o signing.o
+ 
+ # Similarly, we want a single .so for the dynamic-load module
