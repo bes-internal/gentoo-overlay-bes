@@ -440,6 +440,7 @@ src_configure() {
         if use experimental_dmarc; then
                 cat >> Makefile <<- EOC
 			EXPERIMENTAL_DMARC_NATIVE=yes
+			LOOKUP_PSL=yes
 		EOC
         fi
 
