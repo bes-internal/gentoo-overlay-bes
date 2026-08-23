@@ -23,16 +23,17 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 
-IUSE="arc berkdb +dane dcc +dkim dlfunc dmarc +dnsdb doc dovecot-sasl
+IUSE="arc berkdb +dane dcc +dkim dlfunc dmarc experimental_dmarc +dnsdb doc dovecot-sasl
 	dsn gdbm gnutls gsasl idn ipv6 ldap lmtp maildir mbx
 	mysql nis pam perl pkcs11 postgres +prdr proxy redis sasl
-	selinux socks5 spf sqlite srs +ssl syslog +tdb tcpd +tpda"
+	selinux socks5 spf experimental_spf sqlite srs +ssl syslog +tdb tcpd +tpda"
 REQUIRED_USE="
-	arc? ( dkim spf )
+	arc? ( dkim ^^ ( spf experimental_spf ) )
 	dane? ( ssl !gnutls )
 	!dane? ( ssl? ( gnutls ) )
-	dmarc? ( dkim spf )
-	spf? ( perl )
+        experimental_spf? ( !spf perl )
+	dmarc? ( dkim ^^ ( spf experimental_spf ) )
+        experimental_dmarc? ( !dmarc dkim ^^ ( spf experimental_spf ) )
 	dkim? ( ssl !gnutls )
 	gnutls? ( ssl )
 	pkcs11? ( ssl )
@@ -81,7 +82,8 @@ COMMON_DEPEND=">=sys-apps/sed-4.0.5
 	sasl? ( >=dev-libs/cyrus-sasl-2.1.26-r2 )
 	gsasl? ( net-misc/gsasl )
 	redis? ( dev-libs/hiredis:= )
-	spf? ( dev-perl/Mail-SPF )
+	spf? ( >=mail-filter/libspf2-1.2.5-r1 )
+	experimental_spf? ( dev-perl/Mail-SPF )
 	dmarc? ( mail-filter/opendmarc:= )
 	sqlite? ( dev-db/sqlite:= )
 	virtual/libcrypt:=
@@ -435,13 +437,24 @@ src_configure() {
 			EXTRALIBS_EXIM += -lopendmarc
 		EOC
 	fi
+        if use experimental_dmarc; then
+                cat >> Makefile <<- EOC
+			EXPERIMENTAL_DMARC_NATIVE=yes
+		EOC
+        fi
 
 	# Sender Policy Framework
 	if use spf; then
 		cat >> Makefile <<- EOC
-                        EXPERIMENTAL_SPF_PERL=yes
+			SUPPORT_SPF=yes
+			EXTRALIBS_EXIM += -lspf2
 		EOC
 	fi
+        if use experimental_spf; then
+		cat >> Makefile <<- EOC
+			EXPERIMENTAL_SPF_PERL=yes
+		EOC
+        fi
 
 	#
 	# experimental features
