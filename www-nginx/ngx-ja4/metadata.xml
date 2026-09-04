@@ -10,15 +10,13 @@
 		<name>Proxy Maintainers</name>
 	</maintainer>
 	<longdescription>
-		ngx-brotli provides support for Brotli compression in NGINX server. Brotli is a
-		generic-purpose lossless compression algorithm that compresses data using a
-		combination of a modern variant of the LZ77 algorithm, Huffman coding and 2nd order context
-		modeling, with a compression ratio comparable to the best currently available
-		general-purpose compression methods. It is similar in speed with deflate but offers more
-		dense compression.
+		ngx-ja4 adds JA4 TLS fingerprinting support to the NGINX server. JA4 is a
+		fingerprinting method that identifies TLS clients based on characteristics
+		of their TLS ClientHello, making the fingerprint available to NGINX for use
+		in logging, access control, or request routing decisions.
 	</longdescription>
 	<upstream>
-		<bugs-to>https://github.com/google/ngx_brotli/issues</bugs-to>
-		<remote-id type="github">google/ngx_brotli</remote-id>
+		<bugs-to>https://github.com/bes-internal/ja4-nginx-module/issues</bugs-to>
+		<remote-id type="github">bes-internal/ja4-nginx-module</remote-id>
 	</upstream>
 </pkgmetadata>

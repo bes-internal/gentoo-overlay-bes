@@ -14,7 +14,6 @@ LICENSE="MIT"
 SLOT="0"
 KEYWORDS="amd64 arm64"
 
-# Добавляем termion и её зависимости
 CRATES="
    atty-0.2.11
     bstr-1.12.1
