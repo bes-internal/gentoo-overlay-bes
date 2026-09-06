@@ -13,7 +13,6 @@ version-related breakage before committing.
 
 | Package | Feed / listing | Notes |
 |---|---|---|
-| www-apps/gitea | https://github.com/go-gitea/gitea/releases.atom | GitHub Atom releases feed |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
 
 General rule for a package not yet in this table: if upstream is on
@@ -60,20 +59,19 @@ than the main `::gentoo` tree at the time. Once stock Gentoo catches up,
 check whether the overlay ebuild is still pulling its weight:
 
 1. Check what the main `::gentoo` tree provides now (`eix -e <package>`
-   on the Gentoo host lists all known versions tagged by repo, with `~`
-   marking unstable/testing keywords). What matters here is a **stable**
-   ebuild (no leading `~` on the host's arch) — a `~arch`-only stock
-   ebuild doesn't count as coverage, since it isn't what most users of
-   this arch would actually get.
+   on the Gentoo host lists all known versions tagged by repo). A
+   `~arch`-only (testing/unstable) stock ebuild still counts as
+   coverage here — this overlay doesn't need to duplicate a version
+   stock already carries at any stability level.
 2. Diff this overlay's ebuild against the corresponding stock Gentoo
    ebuild (same or nearest version) — look at `files/` (any patches
    added here that stock doesn't carry), `IUSE`/`USE`-conditional logic,
    and the `src_*` functions.
 3. If the overlay ebuild is functionally identical to stock — i.e. the
    only difference is the version string, with no added patches and no
-   changed USE flags/dependencies/build logic — and stock Gentoo has a
-   **stable** version equal to or newer than this overlay's, remove the
-   whole package directory (`git rm -r <category>/<package>`). It's pure
+   changed USE flags/dependencies/build logic — and stock Gentoo's
+   version is equal to or newer than this overlay's, remove the whole
+   package directory (`git rm -r <category>/<package>`). It's pure
    duplication at that point.
 4. If the overlay ebuild carries real customization (extra patches,
    different USE flags, changed dependencies, altered `src_*` logic),
