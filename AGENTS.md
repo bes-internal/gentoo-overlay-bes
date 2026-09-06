@@ -13,6 +13,7 @@ version-related breakage before committing.
 
 | Package | Feed / listing | Notes |
 |---|---|---|
+| www-apps/gitea | https://github.com/go-gitea/gitea/releases.atom | GitHub Atom releases feed |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
 
 General rule for a package not yet in this table: if upstream is on
