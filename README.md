@@ -23,4 +23,5 @@ $ emaint sync -r bes
 - sys-cluster/csync2
 - dev-util/diffr: Diff tool with colorized word-level highlighting inside changed lines
 - www-apps/gitea-runner-bin 
+- www-nginx/ngx-ja4: JA4 TLS fingerprinting module for NGINX
 - mail-mta/exim + use experimental_spf/dmarc 

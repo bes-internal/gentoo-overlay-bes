@@ -73,7 +73,8 @@ check whether the overlay ebuild is still pulling its weight:
    changed USE flags/dependencies/build logic — and stock Gentoo's
    version is equal to or newer than this overlay's, remove the whole
    package directory (`git rm -r <category>/<package>`). It's pure
-   duplication at that point.
+   duplication at that point. Also remove its line from README.md's
+   "Atoms" section, and delete any now-empty directory left behind.
 4. If the overlay ebuild carries real customization (extra patches,
    different USE flags, changed dependencies, altered `src_*` logic),
    keep it even if its version is now behind what stock Gentoo ships —
@@ -93,6 +94,10 @@ This is a personal single-maintainer overlay — commit straight to
 
 ### Constraints
 
+- Keep README.md's "Atoms" section in sync with what's actually in the
+  overlay: add a line when a package is added, remove its line when a
+  package is removed. A version bump alone doesn't need a README
+  change.
 - Never remove an older ebuild version as part of a routine bump.
 - Don't change `KEYWORDS` on the new ebuild beyond what the old one had
   unless the bump is deliberately also a stabilization — that's a
