@@ -52,11 +52,40 @@ add the package.
 6. If the build fails on something simple and clearly version-related
    (a renamed Makefile variable, a patch that's now upstreamed and no
    longer applies, a moved config option, etc.), fix it directly in the
-   new ebuild. If the failure is non-trivial (new dependencies, real
-   incompatibility, needs an actual new patch), stop and report it —
-   don't guess at a real fix.
+   new ebuild — this is still the first revision of *this* version's
+   ebuild, so no `-rN` needed yet. If the failure is non-trivial (new
+   dependencies, real incompatibility, needs an actual new patch), stop
+   and report it — don't guess at a real fix. If you later come back and
+   change an already-committed version's ebuild (e.g. add a patch after
+   the fact, as opposed to fixing it before the first commit), see
+   "Ebuild revision suffix (-rN)" below.
 7. Once it builds cleanly, `git add` the new ebuild + Manifest and
    commit.
+
+### Ebuild revision suffix (-rN)
+
+Gentoo version syntax is `<upstream-version>[-rN]`. The `-rN` suffix is
+never part of upstream's own version — it belongs exclusively to the
+ebuild maintainer (here: this overlay) as a revision counter for the
+*same* upstream version. Suffixes like `_alpha`, `_beta`, `_pN`, `_rcN`
+etc. are part of upstream's version string instead, when upstream uses
+them — never invent one of those ourselves either.
+
+- A brand-new ebuild for a version never published in this overlay
+  before does **not** need `-rN`, even if it carries patches or a
+  `+someflag` customization from day one — that's just the first
+  (implicit `-r0`) ebuild for that version. Plenty of stock Gentoo
+  ebuilds ship patches with no `-rN` for exactly this reason.
+- Add (or increment) `-rN` when you modify an **already published**
+  ebuild for the *same* upstream version without a new upstream release
+  behind it — e.g. adding/removing/changing a patch, altering `src_*`
+  logic, or fixing a USE-flag/dependency bug in the ebuild itself.
+  `git mv` the file to bump it (`-r1` the first time such a change is
+  made, `-r2` the next, etc.) rather than silently editing the existing
+  filename in place.
+- Package and category names may contain `A-Za-z0-9+-._` but must not
+  end in a hyphen followed by a digit, to avoid being misread as a
+  version.
 
 ### When a package no longer needs to live in this overlay
 
