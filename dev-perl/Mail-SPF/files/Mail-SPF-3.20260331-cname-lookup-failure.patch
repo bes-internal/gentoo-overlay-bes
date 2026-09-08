@@ -1,0 +1,23 @@
+diff --git a/lib/Mail/SPF/Record.pm b/lib/Mail/SPF/Record.pm
+index 1cb1f1b..0aad3c7 100644
+--- a/lib/Mail/SPF/Record.pm
++++ b/lib/Mail/SPF/Record.pm
+@@ -411,11 +411,16 @@ sub eval {
+                     foreach my $dom ( @include_domains ) {
+                       my $packet;
+                       if(not exists $inc_domain_cname{$dom}) {
+-                        $packet = $server->dns_lookup($dom, 'CNAME');
++                        # This CNAME check is auxiliary; a DNS failure here must
++                        # not turn an otherwise valid SPF evaluation into a
++                        # temperror, so treat any lookup error as "no CNAME".
++                        eval { $packet = $server->dns_lookup($dom, 'CNAME'); };
++                        next if $@;
+                         $inc_domain_cname{$dom} = $packet->{answer}[0]->{cname}->{name};
+                       }
+                       if(defined $inc_domain_cname{$dom}) {
+-                        if(grep /^$inc_domain_cname{$dom}$/, @include_domains) {
++                        (my $cname = $inc_domain_cname{$dom}) =~ s/\.$//;
++                        if(grep { lc($_) eq lc($cname) } @include_domains) {
+                           $server->throw_result('fail', $request,
+                                       'referencing the same TXT record through multiple CNAME aliases is not permitted');
+                         }

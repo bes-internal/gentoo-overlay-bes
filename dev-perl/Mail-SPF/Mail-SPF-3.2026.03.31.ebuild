@@ -28,6 +28,7 @@ BDEPEND="
 
 src_prepare() {
 	perl-module_src_prepare
+	eapply "${FILESDIR}"/Mail-SPF-${DIST_VERSION}-cname-lookup-failure.patch
 	sed -i \
 		-e "s:spfquery:spfquery.pl:" \
 		-e "s:spfd:spfd.pl:" \
