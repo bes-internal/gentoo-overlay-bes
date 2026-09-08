@@ -13,13 +13,18 @@ version-related breakage before committing.
 
 | Package | Feed / listing | Notes |
 |---|---|---|
+| dev-perl/Mail-SPF | https://fastapi.metacpan.org/v1/release/Mail-SPF | CPAN distribution — check the `version`/`date` fields in the JSON. The GitHub mirror (fastmail/mail-spf) publishes no releases/tags, don't use it. |
 | www-apps/gitea | https://github.com/go-gitea/gitea/releases.atom | GitHub Atom releases feed |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
 
 General rule for a package not yet in this table: if upstream is on
 GitHub, its feed is `<homepage>/releases.atom`; if upstream is on a Gitea
-instance, it's `<releases-url>.rss`. Add the new row here when you add
-the package.
+instance, it's `<releases-url>.rss`; if it's a CPAN Perl distribution
+(`dev-perl/*`, sourced via `perl-module.eclass`), use
+`https://fastapi.metacpan.org/v1/release/<Distribution-Name>` and read
+the `version`/`date` fields — don't assume a GitHub mirror of a CPAN
+module publishes releases, check first. Add the new row here when you
+add the package.
 
 ### Procedure per package
 
