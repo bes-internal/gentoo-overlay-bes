@@ -30,6 +30,7 @@ S="${WORKDIR}/${PN}-${P}"
 
 src_prepare() {
 	default
+	eapply "${FILESDIR}"/${PN}-2.0-gnutls-eagain-large-sync-abort.patch
 	eautoreconf
 }
 
