@@ -46,3 +46,91 @@ Taken from: https://github.com/LINBIT/csync2/issues/45
  	else
  #endif
  	{
+
+512-byte network chunks halve throughput on large transfers: csync2
+moved file payloads (csync_send_file(), csync_recv_file(),
+csync_rs_check()) in 512-byte chunks, which over TLS works out to
+roughly one record per 512 bytes - a lot of overhead versus the 16 KiB
+a TLS record actually holds. Bumping the chunk size to 16384 (the max
+TLS record payload) roughly halved sync time in upstream's testing
+(1938s -> 979s for 31.66 GB / 56525 files); 64 KiB gains nothing more
+since TLS re-splits into 16 KiB records anyway. Depends on the #45 fix
+above: above the TLS record limit, a short count from
+gnutls_record_send() used to be treated as fatal by csync_send_file().
+
+Taken from: https://github.com/LINBIT/csync2/issues/46
+
+--- a/rsync.c
++++ b/rsync.c
+@@ -42,6 +42,8 @@
+ #include <w32api/windows.h>
+ #endif
+
++#define CSYNC_CHUNK 16384
++
+
+ /* This has been taken from rsync:lib/compat.c */
+
+@@ -370,7 +372,7 @@
+
+ void csync_send_file(FILE *in)
+ {
+-	char buffer[512];
++	char buffer[CSYNC_CHUNK];
+ 	int rc, chunk;
+ 	long size;
+
+@@ -381,7 +383,7 @@
+ 	conn_printf("octet-stream %ld\n", size);
+
+ 	while ( size > 0 ) {
+-		chunk = size > 512 ? 512 : size;
++		chunk = size > CSYNC_CHUNK ? CSYNC_CHUNK : size;
+ 		rc = fread(buffer, 1, chunk, in);
+
+ 		if ( rc <= 0 )
+@@ -398,7 +400,7 @@
+
+ int csync_recv_file(FILE *out)
+ {
+-	char buffer[512];
++	char buffer[CSYNC_CHUNK];
+ 	int rc, chunk;
+ 	long size;
+
+@@ -411,7 +413,7 @@
+ 	csync_debug(3, "Receiving %ld bytes ..\n", size);
+
+ 	while ( size > 0 ) {
+-		chunk = size > 512 ? 512 : size;
++		chunk = size > CSYNC_CHUNK ? CSYNC_CHUNK : size;
+ 		rc = conn_read(buffer, chunk);
+
+ 		if ( rc <= 0 )
+@@ -495,7 +497,7 @@
+ int csync_rs_check(const char *filename, int isreg)
+ {
+ 	FILE *sig_file = 0;
+-	char buffer1[512], buffer2[512];
++	char buffer1[CSYNC_CHUNK], buffer2[CSYNC_CHUNK];
+ 	int rc, chunk, found_diff = 0;
+ 	int backup_errno;
+ 	long size;
+@@ -534,7 +536,7 @@
+ 	}
+
+ 	while (size > 0) {
+-		chunk = size > 512 ? 512 : size;
++		chunk = size > CSYNC_CHUNK ? CSYNC_CHUNK : size;
+ 		rc = conn_read(buffer1, chunk);
+
+ 		if (rc <= 0)
+@@ -568,7 +570,7 @@
+
+ 	/* drain response */
+ 	while (size > 0) {
+-		chunk = size > 512 ? 512 : size;
++		chunk = size > CSYNC_CHUNK ? CSYNC_CHUNK : size;
+ 		rc = conn_read(buffer1, chunk);
+ 		if (rc <= 0)
+ 			csync_fatal("Read-error while receiving data.\n");
