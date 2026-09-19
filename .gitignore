@@ -1,1 +1,7 @@
 .*
+
+# publish the maintenance skill, keep everything else under .claude/
+# (local settings, permissions, etc.) untracked
+!.claude/
+.claude/*
+!.claude/skills/

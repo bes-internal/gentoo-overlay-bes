@@ -43,12 +43,15 @@ add the package.
      that isn't broken.
    - Regenerate the Manifest: `ebuild <new>.ebuild manifest` (needs
      network access to fetch the new distfile).
-5. Test the build. This must run on the actual Gentoo host, since
-   Portage/emerge lives there, not in the agent's own environment:
-   - `ebuild <new>.ebuild clean compile` to build through `src_compile`
-     without touching the live system, or `ebuild <new>.ebuild clean
-     install` to also run `src_install` into the image dir (still not
-     merged into the live system).
+5. Test the build with Portage (`ebuild <new>.ebuild clean compile` to
+   build through `src_compile` without touching the live system, or
+   `ebuild <new>.ebuild clean install` to also run `src_install` into
+   the image dir — still not merged into the live system). This needs
+   `ebuild`/`emerge`, i.e. an actual Gentoo environment with this repo
+   registered as a Portage repo. If the environment this is running in
+   has that (`command -v ebuild`), just run it here; otherwise run it
+   over ssh on a Gentoo host that does, against that host's checkout of
+   this same repo.
 6. If the build fails on something simple and clearly version-related
    (a renamed Makefile variable, a patch that's now upstreamed and no
    longer applies, a moved config option, etc.), fix it directly in the
