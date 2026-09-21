@@ -15,7 +15,24 @@ source of truth for the tracked-package table, the bump procedure, the
 This skill is only the driver loop; if it disagrees with AGENTS.md,
 AGENTS.md wins.
 
-## 0. Environment check
+## 0. Sync with remote
+
+This repo gets worked on from more than one machine/installation, so the
+local checkout can be behind before this run even starts:
+
+1. `git status` — if there are uncommitted changes already here (e.g. an
+   earlier unfinished run of this skill, or work in progress), stash them
+   with `git stash push -u` rather than pulling over them; unstash after
+   the pull below succeeds.
+2. `git fetch origin`, then fast-forward: `git pull --ff-only origin
+   master` (or whatever branch `git status` reports as current). If it's
+   not a clean fast-forward (history has diverged), stop and report it —
+   don't merge or rebase automatically on a single-maintainer repo, that's
+   a human call.
+3. Only proceed to step 1 once the checkout is confirmed current with
+   `origin`.
+
+## 1. Environment check
 
 - `command -v ebuild` / `command -v eix` — if present, this environment
   can build and query Portage directly; do that.
@@ -26,7 +43,7 @@ AGENTS.md wins.
 - Either way, don't assume any particular absolute path for the repo
   checkout on that host — `cd` to wherever its checkout actually is.
 
-## 1. Per-package version check
+## 2. Per-package version check
 
 For each row in AGENTS.md's "Per-package upstream feed" table:
 
@@ -41,12 +58,12 @@ For each row in AGENTS.md's "Per-package upstream feed" table:
    `ls <category>/<package>/*.ebuild`. `${PV}` excludes any `-rN`.
 3. Equal or older upstream -> up to date, note it, next package.
 
-## 2. Newer version found -> decide bump vs. drop vs. skip
+## 3. Newer version found -> decide bump vs. drop vs. skip
 
 Before creating anything, run AGENTS.md's "When a package no longer
 needs to live in this overlay" check:
 
-- `eix -e <package>` (wherever Portage is available, per step 0) —
+- `eix -e <package>` (wherever Portage is available, per step 1) —
   what does stock `::gentoo` provide now? A `~arch` stock ebuild counts
   as coverage.
 - Diff the overlay ebuild against the stock one for the same/nearest
@@ -65,7 +82,7 @@ needs to live in this overlay" check:
   release and there's a reason to carry it, that's a new-package
   addition — do it only if the user asked, or ask first.
 
-## 3. Bump procedure
+## 4. Bump procedure
 
 1. `cp <old-highest>.ebuild <cat>/<pkg>/<pkg>-<newver>.ebuild` (keep the
    old ebuild; never delete a version during a bump).
@@ -73,7 +90,7 @@ needs to live in this overlay" check:
    crate/dep versions, `DIST_VERSION`/`DIST_AUTHOR` for perl. Don't
    restructure working logic.
 3. `cd <cat>/<pkg> && ebuild <pkg>-<newver>.ebuild manifest` (wherever
-   Portage is available, per step 0).
+   Portage is available, per step 1).
 4. Build test the same way:
    `ebuild <pkg>-<newver>.ebuild clean install` (unpack + `src_install`
    into the image dir; never merges into the live system). A plain
@@ -89,7 +106,7 @@ needs to live in this overlay" check:
    `<category>/<package>: bump to <newver>` (+ the standard
    `Co-Authored-By` trailer).
 
-## 4. -rN discipline
+## 5. -rN discipline
 
 If you change an **already-committed** ebuild for the *same* upstream
 version (add/remove/change a patch, alter `src_*`, fix a USE/dep bug),
@@ -98,17 +115,23 @@ brand-new ebuild that ships patches from the start does not need `-rN`.
 Never put `-rN` on something upstream released; never invent
 `_alpha`/`_beta`/`_pN` yourself.
 
-## 5. README + repo hygiene (also worth a spot check every run)
+## 6. README + repo hygiene (also worth a spot check every run)
 
 - README.md "Atoms" list must match the package dirs that actually
   exist — add a line for a new package, remove one for a dropped
   package. A plain version bump needs no README change.
+- Each remaining "Atoms" line should still accurately describe *why*
+  that package is customized (newer version than stock, an extra patch,
+  an extra USE flag, ...) per AGENTS.md's "Keeping README's 'Atoms'
+  descriptions accurate" — diff against stock (same as step 3) and
+  update a stale/missing description, but leave an already-accurate one
+  alone; never overwrite it with a generic placeholder.
 - If a package carries a `files/` patch or a USE/logic delta from stock
   but its highest ebuild has no `-rN`, that's fine only if that ebuild
   has never been revised since first commit — otherwise flag it.
 - No stray empty package directories.
 
-## 6. Finish
+## 7. Finish
 
 - One commit per package action (bump / drop / rename), following the
   AGENTS.md commit convention, each ending with:

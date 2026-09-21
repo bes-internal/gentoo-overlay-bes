@@ -120,6 +120,27 @@ check whether the overlay ebuild is still pulling its weight:
    the customization is still the reason it's here. Prefer rebasing
    that customization onto the newer version over deleting it.
 
+### Keeping README's "Atoms" descriptions accurate
+
+Each line in README.md's "Atoms" section should say *why* the package is
+here — newer version than stock, an extra patch, an extra USE flag, etc.
+— not just repeat the package name. Whenever you touch a package (a
+bump, a patch, or a routine full pass), check that its line still
+describes reality:
+
+- Diff against the corresponding stock Gentoo ebuild (same or nearest
+  version, e.g. via `portageq get_repo_path / gentoo` on a Gentoo host),
+  the same way as in "When a package no longer needs to live in this
+  overlay" above, to see what actually differs from stock right now.
+- If the existing line is still accurate, leave it alone — don't rewrite
+  text that's already correct just to reword it.
+- If it's stale (e.g. describes a version gap that's since closed, or a
+  patch that's since been dropped) or missing, update it to describe the
+  current reason for the customization.
+- Never replace an existing accurate description with a generic
+  placeholder, and never drop a line for a package that's still in the
+  overlay.
+
 ### Commit convention
 
 One commit per package bump:
