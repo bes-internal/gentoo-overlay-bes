@@ -77,10 +77,23 @@ etc. are part of upstream's version string instead, when upstream uses
 them — never invent one of those ourselves either.
 
 - A brand-new ebuild for a version never published in this overlay
-  before does **not** need `-rN`, even if it carries patches or a
-  `+someflag` customization from day one — that's just the first
-  (implicit `-r0`) ebuild for that version. Plenty of stock Gentoo
-  ebuilds ship patches with no `-rN` for exactly this reason.
+  before, for a package that has **no equivalent in `::gentoo`** (stock
+  doesn't carry the package at all), does not need `-rN` — there's
+  nothing to disambiguate from, so the first ebuild is the implicit
+  `-r0`.
+- A brand-new ebuild for a version never published in this overlay
+  before, for a package that **also exists (or plausibly could exist)
+  in `::gentoo`**, and that carries any overlay-specific customization
+  (an added/changed patch, a USE-flag delta, altered `src_*` logic)
+  relative to what a stock ebuild of that version would look like,
+  gets `-r1` from day one — even though it's the first appearance of
+  that version in this overlay. Don't wait for a real collision with a
+  future stock ebuild of the same version: the point of the suffix is
+  that this ebuild's content is never assumed identical to whatever
+  `::gentoo` might publish under the same version string. A version
+  bump that is a pure, uncustomized copy of upstream's release (rare in
+  this overlay, since packages here exist specifically *because* of
+  customization) can stay at implicit `-r0`.
 - Add (or increment) `-rN` when you modify an **already published**
   ebuild for the *same* upstream version without a new upstream release
   behind it — e.g. adding/removing/changing a patch, altering `src_*`
