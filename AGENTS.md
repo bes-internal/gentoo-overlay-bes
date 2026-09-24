@@ -31,15 +31,16 @@ add the package.
 ### Procedure per package
 
 1. Fetch the feed/listing above and find the highest non-prerelease
-   version (skip `-rc`, `beta`, `alpha` tags unless the package
-   intentionally tracks those, e.g. exim's `_rc`).
+   version (skip `-rc`, `beta`, `alpha` tags unless the package's row in
+   the table above says it deliberately tracks them).
 2. Compare it against the highest version already in the overlay
    (`ls <category>/<package>/*.ebuild`).
 3. No newer version -> skip, nothing to do.
 4. Newer version found:
-   - `cp <old-highest>.ebuild <category>/<package>/<package>-<newver>.ebuild`.
-     Keep the old ebuild(s) in place — never delete an existing version as
-     part of a bump.
+   - `cp <old-highest>.ebuild <category>/<package>/<package>-<newver>[-r1].ebuild`
+     (`-r1` per the rules in "Ebuild revision suffix (-rN)" below). Keep
+     the old ebuild(s) in place — never delete an existing version as part
+     of a bump.
    - Edit only what the version bump actually requires (SRC_URI, `S=`,
      pinned crate/dependency versions, etc). Don't restructure anything
      that isn't broken.
@@ -57,8 +58,8 @@ add the package.
 6. If the build fails on something simple and clearly version-related
    (a renamed Makefile variable, a patch that's now upstreamed and no
    longer applies, a moved config option, etc.), fix it directly in the
-   new ebuild — this is still the first revision of *this* version's
-   ebuild, so no `-rN` needed yet. If the failure is non-trivial (new
+   new ebuild — it hasn't been committed yet, so the fix doesn't add a
+   revision. If the failure is non-trivial (new
    dependencies, real incompatibility, needs an actual new patch), stop
    and report it — don't guess at a real fix. If you later come back and
    change an already-committed version's ebuild (e.g. add a patch after

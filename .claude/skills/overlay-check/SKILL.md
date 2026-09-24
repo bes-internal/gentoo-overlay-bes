@@ -84,8 +84,9 @@ needs to live in this overlay" check:
 
 ## 4. Bump procedure
 
-1. `cp <old-highest>.ebuild <cat>/<pkg>/<pkg>-<newver>.ebuild` (keep the
-   old ebuild; never delete a version during a bump).
+1. `cp <old-highest>.ebuild <cat>/<pkg>/<pkg>-<newver>[-r1].ebuild`
+   (`-r1` if the package is customized per AGENTS.md; keep the old
+   ebuild, never delete a version during a bump).
 2. Edit only what the version requires — `SRC_URI`, `S=`, pinned
    crate/dep versions, `DIST_VERSION`/`DIST_AUTHOR` for perl. Don't
    restructure working logic.
@@ -98,8 +99,8 @@ needs to live in this overlay" check:
    to check.
 5. Build fails on something simple and clearly version-related (renamed
    Makefile var, upstreamed patch that no longer applies, moved config
-   option) -> fix it in the new ebuild; still the first revision of this
-   version, no `-rN`. Non-trivial failure (new deps, real breakage,
+   option) -> fix it in the new ebuild before its first commit; that
+   doesn't add a revision. Non-trivial failure (new deps, real breakage,
    needs a real patch) -> stop on this package, report it, keep going
    with the others.
 6. `git add` the new ebuild + Manifest, commit
@@ -108,12 +109,11 @@ needs to live in this overlay" check:
 
 ## 5. -rN discipline
 
-If you change an **already-committed** ebuild for the *same* upstream
-version (add/remove/change a patch, alter `src_*`, fix a USE/dep bug),
-`git mv` it to add or increment `-rN` (`-r1` first, `-r2` next). A
-brand-new ebuild that ships patches from the start does not need `-rN`.
-Never put `-rN` on something upstream released; never invent
-`_alpha`/`_beta`/`_pN` yourself.
+The `-rN` rules live in AGENTS.md's "Ebuild revision suffix (-rN)"
+section: which new ebuilds start at `-r1`, and when to `git mv` an
+already-committed one to add or increment it. Apply them to every new or
+changed ebuild in this pass, and name the file accordingly before running
+`manifest` and the build test.
 
 ## 6. README + repo hygiene (also worth a spot check every run)
 
@@ -134,8 +134,8 @@ Never put `-rN` on something upstream released; never invent
 ## 7. Finish
 
 - One commit per package action (bump / drop / rename), following the
-  AGENTS.md commit convention, each ending with:
-  `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`
+  AGENTS.md commit convention, each ending with the `Co-Authored-By`
+  trailer the harness specifies for this session.
 - Push: `git push origin master`. If it fails on credentials, that's a
   local git/ssh/token setup issue on whatever machine this is running
   on — fix the local git remote/credential config for that machine,
