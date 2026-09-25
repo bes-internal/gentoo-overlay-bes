@@ -86,14 +86,14 @@ needs to live in this overlay" check:
 
 1. `cp <old-highest>.ebuild <cat>/<pkg>/<pkg>-<newver>[-r1].ebuild`
    (`-r1` if the package is customized per AGENTS.md; keep the old
-   ebuild, never delete a version during a bump).
+   ebuild for now; pruning is step 6 below).
 2. Edit only what the version requires — `SRC_URI`, `S=`, pinned
    crate/dep versions, `DIST_VERSION`/`DIST_AUTHOR` for perl. Don't
    restructure working logic.
-3. `cd <cat>/<pkg> && ebuild <pkg>-<newver>.ebuild manifest` (wherever
+3. `cd <cat>/<pkg> && ebuild <pkg>-<newver>[-r1].ebuild manifest` (wherever
    Portage is available, per step 1).
 4. Build test the same way:
-   `ebuild <pkg>-<newver>.ebuild clean install` (unpack + `src_install`
+   `ebuild <pkg>-<newver>[-r1].ebuild clean install` (unpack + `src_install`
    into the image dir; never merges into the live system). A plain
    `clean compile` if install is slow and there's nothing install-side
    to check.
@@ -103,9 +103,13 @@ needs to live in this overlay" check:
    doesn't add a revision. Non-trivial failure (new deps, real breakage,
    needs a real patch) -> stop on this package, report it, keep going
    with the others.
-6. `git add` the new ebuild + Manifest, commit
+6. Prune per AGENTS.md's "Retention" section (newest major keeps two,
+   older majors keep one): `git rm` the surplus ebuilds and re-run
+   `ebuild <pkg>-<newver>[-r1].ebuild manifest` so their `DIST` entries
+   go too.
+7. `git add` the new ebuild + Manifest, commit
    `<category>/<package>: bump to <newver>` (+ the standard
-   `Co-Authored-By` trailer).
+   `Co-Authored-By` trailer). The pruning goes in this same commit.
 
 ## 5. -rN discipline
 
@@ -126,24 +130,25 @@ changed ebuild in this pass, and name the file accordingly before running
   descriptions accurate" — diff against stock (same as step 3) and
   update a stale/missing description, but leave an already-accurate one
   alone; never overwrite it with a generic placeholder.
-- If a package carries a `files/` patch or a USE/logic delta from stock
-  but its highest ebuild has no `-rN`, that's fine only if that ebuild
-  has never been revised since first commit — otherwise flag it.
+- If a package that also exists in `::gentoo` carries a `files/` patch or
+  a USE/logic delta from stock but its highest ebuild has no `-rN`, flag
+  it: per AGENTS.md's "-rN" rules such an ebuild should be at least `-r1`.
 - No stray empty package directories.
 
 ## 7. Finish
 
-- One commit per package action (bump / drop / rename), following the
+- One commit per package action (bump / drop / rename / prune), following the
   AGENTS.md commit convention, each ending with the `Co-Authored-By`
   trailer the harness specifies for this session.
 - Push: `git push origin master`. If it fails on credentials, that's a
   local git/ssh/token setup issue on whatever machine this is running
   on — fix the local git remote/credential config for that machine,
   don't hardcode a key path or workaround here.
-- Report a short summary: bumped / dropped / renamed / already-current /
-  failed-and-needs-a-human.
+- Report a short summary: bumped / dropped / renamed / pruned /
+  already-current / failed-and-needs-a-human.
 
 Do the clean, unambiguous work unattended (plain version bumps,
-pure-duplicate removals, obvious `-rN` renames). Stop and ask before:
+pure-duplicate removals, retention-rule pruning, obvious `-rN` renames).
+Stop and ask before:
 adding a brand-new package, dropping a package that has any
 customization, or committing a non-trivial build fix.

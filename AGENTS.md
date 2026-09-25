@@ -39,8 +39,8 @@ add the package.
 4. Newer version found:
    - `cp <old-highest>.ebuild <category>/<package>/<package>-<newver>[-r1].ebuild`
      (`-r1` per the rules in "Ebuild revision suffix (-rN)" below). Keep
-     the old ebuild(s) in place — never delete an existing version as part
-     of a bump.
+     the old ebuild(s) in place at this point; pruning happens afterwards,
+     per "Retention: newest major keeps two, older majors keep one" below.
    - Edit only what the version bump actually requires (SRC_URI, `S=`,
      pinned crate/dependency versions, etc). Don't restructure anything
      that isn't broken.
@@ -65,8 +65,21 @@ add the package.
    change an already-committed version's ebuild (e.g. add a patch after
    the fact, as opposed to fixing it before the first commit), see
    "Ebuild revision suffix (-rN)" below.
-7. Once it builds cleanly, `git add` the new ebuild + Manifest and
-   commit.
+7. Once it builds cleanly, prune per the retention rule below, then
+   `git add` the new ebuild + Manifest and commit.
+
+### Retention: newest major keeps two, older majors keep one
+
+Keep at most the two highest ebuilds in the newest major-version line of
+a package (major = the first component of the version: `3.x` and `4.x`
+are separate lines), and only the single highest ebuild in each older
+major line once a newer major exists. Example: with `3.5.0`, `4.0.0` and
+`4.0.1` present, keep `3.5.0`, `4.0.0` and `4.0.1`; a later `4.1.0`
+would drop `4.0.0`. After a bump, delete the ones beyond that limit,
+regenerate the Manifest so the removed versions' `DIST` entries are gone,
+and include the deletion in the same commit as the bump. Different
+`-rN` of one upstream version count as separate ebuilds. Any package
+already over the limit can be trimmed the same way during a routine pass.
 
 ### Ebuild revision suffix (-rN)
 
@@ -163,6 +176,9 @@ One commit per package bump:
 <category>/<package>: bump to <newver>
 ```
 
+A prune-only commit (retention trim with no new version) uses
+`<category>/<package>: prune old versions`.
+
 This is a personal single-maintainer overlay — commit straight to
 `master` and push directly, no PRs.
 
@@ -172,7 +188,9 @@ This is a personal single-maintainer overlay — commit straight to
   overlay: add a line when a package is added, remove its line when a
   package is removed. A version bump alone doesn't need a README
   change.
-- Never remove an older ebuild version as part of a routine bump.
+- Only remove older ebuild versions as the retention rule above
+  prescribes (beyond the two latest in the newest major line and the one
+latest in each older major line); never more.
 - Don't change `KEYWORDS` on the new ebuild beyond what the old one had
   unless the bump is deliberately also a stabilization — that's a
   separate decision, not a routine version bump.
