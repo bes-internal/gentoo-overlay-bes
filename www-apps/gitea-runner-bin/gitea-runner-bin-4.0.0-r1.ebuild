@@ -47,6 +47,13 @@ src_install() {
 	exeinto /usr/bin
 	newexe "gitea-runner-bin-${PV}-${arch_suffix}" gitea-runner
 
+	# generate the current config for current version
+	local runner="${WORKDIR}/gitea-runner-bin-${PV}-${arch_suffix}"
+	chmod +x "${runner}" || die
+	"${runner}" config generate > "${T}/gitea-runner-config.yaml" || die "config generate failed"
+	insinto /etc/gitea
+	newins "${T}/gitea-runner-config.yaml" gitea-runner-config.yaml
+
 	newinitd "${FILESDIR}/gitea-runner.initd" gitea-runner
 
 	newconfd "${FILESDIR}/gitea-runner.confd" gitea-runner
@@ -59,7 +66,7 @@ src_install() {
 pkg_postinst() {
 	elog "To start the runner:"
 	elog "  Register: sudo -u git gitea-runner register"
-        elog "  Create config: gitea-runner generate-config > /etc/gitea/gitea-runner-config.yaml"
+	elog "  Edit /etc/gitea/gitea-runner-config.yaml"
 	elog "  Start: rc-service gitea-runner start"
 	elog ""
 	elog "Make sure the 'git' user exists and has access to Docker socket."
