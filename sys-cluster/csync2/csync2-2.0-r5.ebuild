@@ -31,6 +31,8 @@ S="${WORKDIR}/${PN}-${P}"
 src_prepare() {
 	default
 	eapply "${FILESDIR}"/${PN}-2.0-gnutls-eagain-large-sync-abort.patch
+	# security: stack-use-after-scope in the unauthenticated-peer reply (LINBIT/csync2#49)
+	eapply "${FILESDIR}"/${PN}-2.0-fix-stack-use-after-scope.patch
 	eautoreconf
 }
 

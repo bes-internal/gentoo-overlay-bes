@@ -1,0 +1,47 @@
+From 85f81de7542033a5f792e833846272e990a26567 Mon Sep 17 00:00:00 2001
+From: Evgeniy Gorbanyov <esgor@altlinux.org>
+Date: Fri, 25 Sep 2026 16:14:07 +0600
+Subject: [PATCH] fix stack-use-after-scope in the unauthenticated-peer reply
+
+csync_inet_ntop() returned the address of its own stack buffer.
+conn_printf() read that pointer after the callee returned, which
+AddressSanitizer reports when a command arrives before HELLO.
+
+Signed-off-by: Evgeniy Gorbanyov <esgor@altlinux.org>
+---
+ daemon.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/daemon.c b/daemon.c
+index 7fb53bb..a86c751 100644
+--- a/daemon.c
++++ b/daemon.c
+@@ -331,14 +331,13 @@ typedef union address {
+ 	struct sockaddr_storage ss;
+ } address_t;
+ 
+-const char *csync_inet_ntop(address_t *addr)
++const char *csync_inet_ntop(address_t *addr, char *buf, socklen_t len)
+ {
+-	char buf[INET6_ADDRSTRLEN];
+ 	sa_family_t af = addr->sa.sa_family;
+ 	return inet_ntop(af,
+ 		af == AF_INET  ? (void*)&addr->sa_in.sin_addr :
+ 		af == AF_INET6 ? (void*)&addr->sa_in6.sin6_addr : NULL,
+-		buf, sizeof(buf));
++		buf, len);
+ }
+ 
+ /*
+@@ -517,8 +516,10 @@ void csync_daemon_session()
+ 		cmd_error = 0;
+ 
+ 		if ( cmdtab[cmdnr].need_ident && !peer ) {
++			char buf[INET6_ADDRSTRLEN];
++
+ 			conn_printf("Dear %s, please identify first.\n",
+-				    csync_inet_ntop(&peername) ?: "stranger");
++				    csync_inet_ntop(&peername, buf, sizeof(buf)) ?: "stranger");
+ 			goto next_cmd;
+ 		}
+ 

@@ -20,7 +20,7 @@ $ emaint sync -r bes
 ## Atoms
 
 - sys-apps/busybox: extra use flag for all suppressed commands in base gentoo (beep, inetd, ipcalc, inotifyd, rfkill, ...)
-- sys-cluster/csync2: not packaged in the main ::gentoo tree
+- sys-cluster/csync2: not packaged in the main ::gentoo tree; carries extra patches (gnutls EAGAIN on large sync, security: stack-use-after-scope fix in the pre-auth reply, LINBIT/csync2#49)
 - dev-util/diffr: Diff tool with colorized word-level highlighting inside changed lines, not packaged in the main ::gentoo tree
 - dev-perl/Mail-SPF: newer CPAN release than what's in the main ::gentoo tree
 - www-apps/gitea-runner-bin: not packaged in the main ::gentoo tree
