@@ -33,6 +33,8 @@ src_prepare() {
 	eapply "${FILESDIR}"/${PN}-2.0-gnutls-eagain-large-sync-abort.patch
 	# security: stack-use-after-scope in the unauthenticated-peer reply (LINBIT/csync2#49)
 	eapply "${FILESDIR}"/${PN}-2.0-fix-stack-use-after-scope.patch
+	# security: buffer overflow in get_tmpname() on overlong directory prefixes (LINBIT/csync2#50)
+	eapply "${FILESDIR}"/${PN}-2.0-fix-get_tmpname-overflow.patch
 	eautoreconf
 }
 
