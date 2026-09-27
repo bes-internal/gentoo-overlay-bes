@@ -24,7 +24,7 @@ SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~sparc ~x86"
 
 IUSE="arc berkdb +dane dcc +dkim dlfunc dmarc experimental_dmarc +dnsdb doc dovecot-sasl
-	dsn gdbm gnutls gsasl idn ipv6 ldap lmtp maildir mbx
+	dsn gdbm gnutls gsasl idn ldap lmtp maildir mbx
 	mysql nis pam perl pkcs11 postgres +prdr proxy redis sasl
 	selinux socks5 spf experimental_spf sqlite srs +ssl syslog +tdb tcpd +tpda"
 REQUIRED_USE="
@@ -115,7 +115,7 @@ src_prepare() {
 	eapply     "${FILESDIR}"/exim-4.69-r1.27021.patch
 	eapply     "${FILESDIR}"/exim-4.97-localscan_dlopen.patch
 	eapply     "${FILESDIR}"/exim-4.97-no-exim_id_update.patch
-	eapply     "${FILESDIR}"/exim-4.100-dkim_no_direct_ld.patch
+	eapply     "${FILESDIR}"/exim-4.100.1-miscmods-no-direct-ld.patch # 976375, 982617
 
 	if use maildir ; then
 		eapply "${FILESDIR}"/exim-4.94-maildir.patch
@@ -168,6 +168,7 @@ src_configure() {
 		SPOOL_DIRECTORY=${EPREFIX}/var/spool/exim
 		HAVE_ICONV=yes
 		WITH_CONTENT_SCAN=yes
+		HAVE_IPV6=YES
 	EOC
 
 	# configure db implementation, Exim always needs one for its hints
@@ -214,12 +215,6 @@ src_configure() {
 		EOC
 	fi
 
-	# support for IPv6
-	if use ipv6; then
-		cat >> Makefile <<- EOC
-			HAVE_IPV6=YES
-		EOC
-	fi
 
 	# support i18n/IDNA
 	if use idn; then
