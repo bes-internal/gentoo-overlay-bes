@@ -15,7 +15,6 @@ version-related breakage before committing.
 |---|---|---|
 | dev-perl/Mail-SPF | https://fastapi.metacpan.org/v1/release/Mail-SPF | CPAN distribution — check the `version`/`date` fields in the JSON. The GitHub mirror (fastmail/mail-spf) publishes no releases/tags, don't use it. |
 | mail-mta/exim | https://code.exim.org/exim/exim/releases.rss | Forgejo instance (Gitea-compatible) — same `<releases-url>.rss` pattern as a Gitea feed. Entries are tagged `exim-<version>`; skip `-RC*` prereleases. Security fixes ship as ordinary point releases here too (e.g. `4.100.1` fixed four security issues), so there's no separate CVE feed to check. |
-| www-apps/gitea | https://github.com/go-gitea/gitea/releases.atom | GitHub Atom releases feed |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
 
 General rule for a package not yet in this table: if upstream is on
