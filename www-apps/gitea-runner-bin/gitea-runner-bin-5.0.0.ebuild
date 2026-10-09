@@ -24,6 +24,7 @@ IUSE=""
 
 RDEPEND="
 	app-containers/docker
+	dev-vcs/git
 "
 
 S="${WORKDIR}"
