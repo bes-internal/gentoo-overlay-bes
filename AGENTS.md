@@ -14,8 +14,13 @@ version-related breakage before committing.
 | Package | Feed / listing | Notes |
 |---|---|---|
 | dev-perl/Mail-SPF | https://fastapi.metacpan.org/v1/release/Mail-SPF | CPAN distribution — check the `version`/`date` fields in the JSON. The GitHub mirror (fastmail/mail-spf) publishes no releases/tags, don't use it. |
-| mail-mta/exim | https://code.exim.org/exim/exim/releases.rss | Forgejo instance (Gitea-compatible) — same `<releases-url>.rss` pattern as a Gitea feed. Entries are tagged `exim-<version>`; skip `-RC*` prereleases. Security fixes ship as ordinary point releases here too (e.g. `4.100.1` fixed four security issues), so there's no separate CVE feed to check. |
+| mail-mta/exim | https://downloads.exim.org/exim4/ | Directory listing of release tarballs: take the highest `exim-<version>.tar.xz`. Point/fix releases also appear under `fixes/`, RCs under `test/` (skip those). The code.exim.org releases RSS this row used to name now returns 404. Security fixes ship as ordinary point releases (e.g. `4.100.1` fixed four security issues), so there's no separate CVE feed to check. |
+| sys-apps/busybox | `::gentoo` tree (`eix -e sys-apps/busybox`, or `ls $(portageq get_repo_path / gentoo)/sys-apps/busybox/`) | Tracked against stock Gentoo, not upstream busybox.net: bump only when `::gentoo` has a newer version than this overlay, ignoring live `9999`. Base the new ebuild on stock's ebuild for that version and re-apply this overlay's customization on top, rather than copying our older ebuild forward. |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
+
+A row whose feed is the `::gentoo` tree follows stock Gentoo's versions
+instead of upstream's: compare against stock rather than fetching any
+release feed.
 
 General rule for a package not yet in this table: if upstream is on
 GitHub, its feed is `<homepage>/releases.atom`; if upstream is on a Gitea
@@ -117,6 +122,30 @@ them — never invent one of those ourselves either.
 - Package and category names may contain `A-Za-z0-9+-._` but must not
   end in a hyphen followed by a digit, to avoid being misread as a
   version.
+
+### Pulling fixes from ::gentoo
+
+For every package that also exists in `::gentoo`, check on each routine
+pass (and whenever you touch the package) what stock has fixed since our
+ebuild was written, and carry it over:
+
+1. Diff our highest ebuild and its `files/` against stock's ebuild for
+   the same version (or the nearest one) and stock's `files/`.
+2. Sort every difference into two groups. One is this overlay's own
+   customization (see the package's README "Atoms" line): keep it. The
+   other is work stock has done that we don't have yet: bug fixes, new
+   or updated patches, dependency fixes, `Bug:`/`#NNNNNN` references,
+   dropped obsolete patches, `pkg_*` fixes. Port that into our ebuild.
+3. Judge each stock change on its merits rather than copying blindly.
+   Stock can also lose something that still matters (e.g. a
+   `REQUIRED_USE` constraint dropped during a rewrite): if our ebuild
+   still needs it, keep it and say why in the commit message. Purely
+   cosmetic churn (comment wording, copyright year) needn't be ported on
+   its own.
+4. Porting into an already-published ebuild is a revision bump per the
+   `-rN` rules below. Build-test as in the bump procedure, then commit as
+   `<category>/<package>: sync fixes from ::gentoo`, listing the ported
+   bug numbers in the body.
 
 ### When a package no longer needs to live in this overlay
 

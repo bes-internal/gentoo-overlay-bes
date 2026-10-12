@@ -49,6 +49,8 @@ For each row in AGENTS.md's "Per-package upstream feed" table:
 
 1. Fetch the feed and find the highest non-prerelease version (skip
    `-rc`/`beta`/`alpha` unless the package deliberately tracks those).
+   If the row's feed is the `::gentoo` tree, the "upstream" version is
+   the highest non-live version stock carries (`eix -e <package>`).
    - GitHub `*/releases.atom`, Gitea `*/releases.rss`: fetch directly.
    - MetaCPAN (`fastapi.metacpan.org/v1/release/<Dist>`): if a plain
      web fetch gets blocked (e.g. HTTP 402), fall back to `curl` from
@@ -119,6 +121,14 @@ already-committed one to add or increment it. Apply them to every new or
 changed ebuild in this pass, and name the file accordingly before running
 `manifest` and the build test.
 
+## 5a. Pull fixes from ::gentoo
+
+For every package that also exists in `::gentoo`, run AGENTS.md's
+"Pulling fixes from ::gentoo" check: diff our ebuild and `files/`
+against stock's, keep our customization, port stock's fixes, bump `-rN`,
+build-test, and commit as `<category>/<package>: sync fixes from
+::gentoo`.
+
 ## 6. README + repo hygiene (also worth a spot check every run)
 
 - README.md "Atoms" list must match the package dirs that actually
@@ -137,18 +147,20 @@ changed ebuild in this pass, and name the file accordingly before running
 
 ## 7. Finish
 
-- One commit per package action (bump / drop / rename / prune), following the
+- One commit per package action (bump / drop / rename / prune / sync), following the
   AGENTS.md commit convention, each ending with the `Co-Authored-By`
   trailer the harness specifies for this session.
 - Push: `git push origin master`. If it fails on credentials, that's a
   local git/ssh/token setup issue on whatever machine this is running
   on — fix the local git remote/credential config for that machine,
   don't hardcode a key path or workaround here.
-- Report a short summary: bumped / dropped / renamed / pruned /
+- Report a short summary: bumped / dropped / renamed / pruned / synced /
   already-current / failed-and-needs-a-human.
 
 Do the clean, unambiguous work unattended (plain version bumps,
-pure-duplicate removals, retention-rule pruning, obvious `-rN` renames).
-Stop and ask before:
+pure-duplicate removals, retention-rule pruning, obvious `-rN` renames,
+straight ports of stock fixes that build cleanly). Stop and ask before:
 adding a brand-new package, dropping a package that has any
-customization, or committing a non-trivial build fix.
+customization, committing a non-trivial build fix, or porting a stock
+change that conflicts with our customization or removes something ours
+still relies on.
