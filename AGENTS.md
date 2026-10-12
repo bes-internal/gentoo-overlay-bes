@@ -15,8 +15,11 @@ version-related breakage before committing.
 |---|---|---|
 | dev-perl/Mail-SPF | https://fastapi.metacpan.org/v1/release/Mail-SPF | CPAN distribution — check the `version`/`date` fields in the JSON. The GitHub mirror (fastmail/mail-spf) publishes no releases/tags, don't use it. |
 | mail-mta/exim | https://downloads.exim.org/exim4/ | Directory listing of release tarballs: take the highest `exim-<version>.tar.xz`. Point/fix releases also appear under `fixes/`, RCs under `test/` (skip those). The code.exim.org releases RSS this row used to name now returns 404. Security fixes ship as ordinary point releases (e.g. `4.100.1` fixed four security issues), so there's no separate CVE feed to check. |
+| dev-util/diffr | https://github.com/mookid/diffr/releases.atom | GitHub Atom releases feed; tags are `v<version>`. |
+| sys-cluster/csync2 | https://github.com/LINBIT/csync2/releases.atom | GitHub Atom releases feed; tags are `csync2-<version>`. Releases are rare (2.0 is the latest); our security patches come from open upstream PRs (#49, #50), so also check whether those got merged and released, and drop the matching patch once they have. |
 | sys-apps/busybox | `::gentoo` tree | Busybox's `X.Y.0` "unstable" releases usually land in stock without keywords (`KEYWORDS` commented out), so they're skipped by the rule below until stock keywords them. |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
+| www-nginx/ngx-ja4 | https://github.com/bes-internal/ja4-nginx-module/releases.atom | Our own module repo; GitHub Atom releases feed, tags are `v<version>`. |
 
 A row whose feed is the `::gentoo` tree follows stock Gentoo's versions
 instead of upstream's, rather than fetching any release feed. The version

@@ -143,6 +143,9 @@ build-test, and commit as `<category>/<package>: sync fixes from
 - If a package that also exists in `::gentoo` carries a `files/` patch or
   a USE/logic delta from stock but its highest ebuild has no `-rN`, flag
   it: per AGENTS.md's "-rN" rules such an ebuild should be at least `-r1`.
+- Every package directory has a row in AGENTS.md's "Per-package upstream
+  feed" table. For one that doesn't, work out its feed per the general
+  rule there, add the row, and check its version in this same pass.
 - No stray empty package directories.
 
 ## 7. Finish
