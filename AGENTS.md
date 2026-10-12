@@ -15,12 +15,18 @@ version-related breakage before committing.
 |---|---|---|
 | dev-perl/Mail-SPF | https://fastapi.metacpan.org/v1/release/Mail-SPF | CPAN distribution — check the `version`/`date` fields in the JSON. The GitHub mirror (fastmail/mail-spf) publishes no releases/tags, don't use it. |
 | mail-mta/exim | https://downloads.exim.org/exim4/ | Directory listing of release tarballs: take the highest `exim-<version>.tar.xz`. Point/fix releases also appear under `fixes/`, RCs under `test/` (skip those). The code.exim.org releases RSS this row used to name now returns 404. Security fixes ship as ordinary point releases (e.g. `4.100.1` fixed four security issues), so there's no separate CVE feed to check. |
-| sys-apps/busybox | `::gentoo` tree (`eix -e sys-apps/busybox`, or `ls $(portageq get_repo_path / gentoo)/sys-apps/busybox/`) | Tracked against stock Gentoo, not upstream busybox.net. The version to follow is the highest one stock marks **stable** (`KEYWORDS` without `~`, e.g. `amd64`). Ignore versions stock ships without keywords (`**` in eix; busybox's `X.Y.0` "unstable" releases usually land that way, with `KEYWORDS` commented out), masked ones, `~arch`-only ones, and the live `9999`. Bump only when that stable version is newer than ours. Base the new ebuild on stock's ebuild for that version and re-apply this overlay's customization on top, rather than copying our older ebuild forward. |
+| sys-apps/busybox | `::gentoo` tree | Busybox's `X.Y.0` "unstable" releases usually land in stock without keywords (`KEYWORDS` commented out), so they're skipped by the rule below until stock keywords them. |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
 
 A row whose feed is the `::gentoo` tree follows stock Gentoo's versions
-instead of upstream's: compare against stock rather than fetching any
-release feed.
+instead of upstream's, rather than fetching any release feed. The version
+to follow is the highest one stock keywords at all, testing (`~amd64`) or
+stable (`amd64`), per `eix -e <package>` or the ebuilds under
+`$(portageq get_repo_path / gentoo)/<category>/<package>/`. Ignore
+versions without keywords (`**` in eix), masked ones, and live `9999`.
+Bump only when that version is newer than ours, and base the new ebuild on
+stock's ebuild for that version with this overlay's customization
+re-applied on top, rather than copying our older ebuild forward.
 
 General rule for a package not yet in this table: if upstream is on
 GitHub, its feed is `<homepage>/releases.atom`; if upstream is on a Gitea

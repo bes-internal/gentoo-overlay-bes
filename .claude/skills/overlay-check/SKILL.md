@@ -49,8 +49,8 @@ For each row in AGENTS.md's "Per-package upstream feed" table:
 
 1. Fetch the feed and find the highest non-prerelease version (skip
    `-rc`/`beta`/`alpha` unless the package deliberately tracks those).
-   If the row's feed is the `::gentoo` tree, the "upstream" version is
-   the highest non-live version stock carries (`eix -e <package>`).
+   If the row's feed is the `::gentoo` tree, pick the version per
+   AGENTS.md's rule for such rows (highest keyworded stock version).
    - GitHub `*/releases.atom`, Gitea `*/releases.rss`: fetch directly.
    - MetaCPAN (`fastapi.metacpan.org/v1/release/<Dist>`): if a plain
      web fetch gets blocked (e.g. HTTP 402), fall back to `curl` from
