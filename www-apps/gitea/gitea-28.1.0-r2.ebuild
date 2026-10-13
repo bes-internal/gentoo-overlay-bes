@@ -26,7 +26,7 @@ RDEPEND="${DEPEND}
 BDEPEND=">=dev-lang/go-1.27.1:="
 
 DOCS=(
-	custom/conf/app.example.ini CHANGELOG.md CONTRIBUTING.md README.md
+	custom/conf/app.example.ini CONTRIBUTING.md README.md
 )
 FILECAPS=(
 	-m 711 cap_net_bind_service+ep usr/bin/gitea
