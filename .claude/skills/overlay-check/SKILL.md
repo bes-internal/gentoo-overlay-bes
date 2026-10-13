@@ -75,21 +75,23 @@ needs to live in this overlay" check:
 - **Identical to stock** (only the version string differs, no added
   patches, no USE/dep/logic changes) **and** stock has an equal-or-newer
   version -> `git rm -r <category>/<package>`, drop its README "Atoms"
-  line, drop its row from the AGENTS.md table, delete the now-empty
-  dir, commit. Done with this package.
+  line, delete the now-empty dir, commit. Keep its row in the AGENTS.md
+  table. Done with this package.
 - **Carries real customization** -> keep it; bump as below (rebase the
   customization onto the new version, don't drop it).
-- Package not in the overlay at all, stock already covers the new
-  version -> nothing to do. If stock is *behind* the new upstream
-  release and there's a reason to carry it, that's a new-package
-  addition — do it only if the user asked, or ask first.
+- Package has a row in AGENTS.md but no directory in the overlay: if
+  upstream is ahead of what stock carries, add an ebuild for the new
+  version (based on stock's ebuild) without asking; otherwise nothing to
+  do. A package with no row at all is a new-package addition: do it only
+  if the user asked, or ask first.
 
 ## 4. Bump procedure
 
 1. `cp <old-highest>.ebuild <cat>/<pkg>/<pkg>-<newver>[-r1].ebuild`
    (`-r1` if the package is customized per AGENTS.md; keep the old
    ebuild for now; pruning is step 6 below).
-2. Edit only what the version requires — `SRC_URI`, `S=`, pinned
+2. Set the header's copyright end year to the current year (AGENTS.md
+   "Ebuild header"), then edit only what the version requires — `SRC_URI`, `S=`, pinned
    crate/dep versions, `DIST_VERSION`/`DIST_AUTHOR` for perl. Don't
    restructure working logic.
 3. `cd <cat>/<pkg> && ebuild <pkg>-<newver>[-r1].ebuild manifest` (wherever

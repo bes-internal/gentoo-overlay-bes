@@ -18,6 +18,7 @@ version-related breakage before committing.
 | dev-util/diffr | https://github.com/mookid/diffr/releases.atom | GitHub Atom releases feed; tags are `v<version>`. |
 | sys-cluster/csync2 | https://github.com/LINBIT/csync2/releases.atom | GitHub Atom releases feed; tags are `csync2-<version>`. Releases are rare (2.0 is the latest); our security patches come from open upstream PRs (#49, #50), so also check whether those got merged and released, and drop the matching patch once they have. |
 | sys-apps/busybox | `::gentoo` tree | Busybox's `X.Y.0` "unstable" releases usually land in stock without keywords (`KEYWORDS` commented out), so they're skipped by the rule below until stock keywords them. |
+| www-apps/gitea | https://github.com/go-gitea/gitea/releases.atom | GitHub Atom releases feed; tags are `v<version>`, skip `-dev`/`-rc` tags. After `1.27.x` upstream switched to major-only numbering (`v28.0.0`, `v28.1.0`, ...); Portage orders `28.x` above `1.27.x`. Base new versions on stock's ebuild. Since 28.x the Go module path is `gitea.dev` (the `-X ...modules/setting.*` ldflags must use it) and SQLite is built in via the pure-Go driver, with USE=sqlite selecting the cgo `sqlite_mattn` driver. |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
 | www-nginx/ngx-ja4 | https://github.com/bes-internal/ja4-nginx-module/releases.atom | Our own module repo; GitHub Atom releases feed, tags are `v<version>`. |
 
@@ -30,6 +31,12 @@ versions without keywords (`**` in eix), masked ones, and live `9999`.
 Bump only when that version is newer than ours, and base the new ebuild on
 stock's ebuild for that version with this overlay's customization
 re-applied on top, rather than copying our older ebuild forward.
+
+A package stays in this table even when its directory has been removed
+from the overlay (e.g. because stock caught up): keep checking its feed,
+and when upstream is ahead of what's in the overlay again, add an ebuild
+for the new version without asking — based on stock's ebuild when stock
+carries the package.
 
 General rule for a package not yet in this table: if upstream is on
 GitHub, its feed is `<homepage>/releases.atom`; if upstream is on a Gitea
@@ -80,6 +87,14 @@ add the package.
    "Ebuild revision suffix (-rN)" below.
 7. Once it builds cleanly, prune per the retention rule below, then
    `git add` the new ebuild + Manifest and commit.
+
+### Ebuild header
+
+Whenever you create or change an ebuild, or add or change a file under
+`files/` that carries a copyright header (init/conf.d scripts and the
+like), its copyright range must end at the current year, e.g.
+`# Copyright 2016-2026 Gentoo Authors`. Keep the start year the source
+file already has (stock's, or ours).
 
 ### Retention: newest major keeps two, older majors keep one
 
@@ -177,7 +192,8 @@ check whether the overlay ebuild is still pulling its weight:
    version is equal to or newer than this overlay's, remove the whole
    package directory (`git rm -r <category>/<package>`). It's pure
    duplication at that point. Also remove its line from README.md's
-   "Atoms" section, and delete any now-empty directory left behind.
+   "Atoms" section, and delete any now-empty directory left behind. Keep
+   its row in the feed table, so a later upstream release brings it back.
 4. If the overlay ebuild carries real customization (extra patches,
    different USE flags, changed dependencies, altered `src_*` logic),
    keep it even if its version is now behind what stock Gentoo ships —
@@ -186,9 +202,12 @@ check whether the overlay ebuild is still pulling its weight:
 
 ### Keeping README's "Atoms" descriptions accurate
 
-Each line in README.md's "Atoms" section should say *why* the package is
-here — newer version than stock, an extra patch, an extra USE flag, etc.
-— not just repeat the package name. Whenever you touch a package (a
+Each package in README.md's "Atoms" section is a top-level bullet with a
+nested list of everything it changes or adds relative to `::gentoo`: one
+sub-bullet per patch (mark security fixes), USE flag, keyword or logic
+delta, and "newer upstream release than `::gentoo`" when that's part of
+the reason. Packages stock doesn't carry are marked "(not in `::gentoo`)"
+and still list what they ship. Don't just repeat the package name. Whenever you touch a package (a
 bump, a patch, or a routine full pass), check that its line still
 describes reality:
 
@@ -196,13 +215,13 @@ describes reality:
   version, e.g. via `portageq get_repo_path / gentoo` on a Gentoo host),
   the same way as in "When a package no longer needs to live in this
   overlay" above, to see what actually differs from stock right now.
-- If the existing line is still accurate, leave it alone — don't rewrite
+- If the existing entry is still accurate, leave it alone — don't rewrite
   text that's already correct just to reword it.
 - If it's stale (e.g. describes a version gap that's since closed, or a
   patch that's since been dropped) or missing, update it to describe the
   current reason for the customization.
 - Never replace an existing accurate description with a generic
-  placeholder, and never drop a line for a package that's still in the
+  placeholder, and never drop an entry for a package that's still in the
   overlay.
 
 ### Commit convention
