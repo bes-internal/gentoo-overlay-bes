@@ -50,6 +50,11 @@ add the package.
 
 ### Procedure per package
 
+Do the expensive work only when something changed. A package whose
+upstream has no newer version and whose stock fingerprint is unchanged
+(see "Pulling fixes from ::gentoo") needs nothing further: no builds, no
+patch-apply tests, no stock diffs. Report it as up to date.
+
 1. Fetch the feed/listing above and find the highest non-prerelease
    version (skip `-rc`, `beta`, `alpha` tags unless the package's row in
    the table above says it deliberately tracks them).
@@ -149,9 +154,20 @@ them — never invent one of those ourselves either.
 
 ### Pulling fixes from ::gentoo
 
-For every package that also exists in `::gentoo`, check on each routine
-pass (and whenever you touch the package) what stock has fixed since our
-ebuild was written, and carry it over:
+For every package that also exists in `::gentoo`, check what stock has
+fixed since our ebuild was last compared, and carry it over. Don't redo
+this on every pass: `stock-state.txt` at the repo root records a
+fingerprint of each stock package directory as of the last comparison.
+
+0. Compute the current fingerprint of stock's `<category>/<package>`
+   (command in the header of `stock-state.txt`). If it equals the recorded
+   one, stock hasn't changed: skip the whole check below, including
+   diffing and patch-applies. Otherwise do steps 1-4, then store the new
+   fingerprint in `stock-state.txt` (in the same commit, or in its own
+   `<category>/<package>: record stock state` commit when nothing needed
+   porting). A package missing from `stock-state.txt` is checked once and
+   added. Also check when you touch the package for another reason
+   (a bump, a patch change).
 
 1. Diff our highest ebuild and its `files/` against stock's ebuild for
    the same version (or the nearest one) and stock's `files/`.

@@ -58,7 +58,10 @@ For each row in AGENTS.md's "Per-package upstream feed" table:
      the only place with working outbound access.
 2. Compare with the highest ebuild in the overlay:
    `ls <category>/<package>/*.ebuild`. `${PV}` excludes any `-rN`.
-3. Equal or older upstream -> up to date, note it, next package.
+3. Equal or older upstream -> up to date, note it, next package. Don't
+   build or test-apply patches for a package with no new upstream
+   version; only step 5a (stock fingerprint changed) can justify work
+   on it.
 
 ## 3. Newer version found -> decide bump vs. drop vs. skip
 
@@ -125,11 +128,15 @@ changed ebuild in this pass, and name the file accordingly before running
 
 ## 5a. Pull fixes from ::gentoo
 
-For every package that also exists in `::gentoo`, run AGENTS.md's
-"Pulling fixes from ::gentoo" check: diff our ebuild and `files/`
+For every package that also exists in `::gentoo`, first compare the
+fingerprint of stock's package directory with the one in
+`stock-state.txt` (AGENTS.md, "Pulling fixes from ::gentoo", step 0). If
+equal, skip the package entirely: no diffs, no patch-apply or build
+tests. If it differs (or the package isn't recorded), run the check:
+diff our ebuild and `files/`
 against stock's, keep our customization, port stock's fixes, bump `-rN`,
 build-test, and commit as `<category>/<package>: sync fixes from
-::gentoo`.
+::gentoo`, then update the package's fingerprint in `stock-state.txt`.
 
 ## 6. README + repo hygiene (also worth a spot check every run)
 
