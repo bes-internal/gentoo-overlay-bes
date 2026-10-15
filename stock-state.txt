@@ -1,6 +1,9 @@
 # Fingerprints of the ::gentoo package directories as of the last time this
 # overlay's ebuilds were compared against stock (see AGENTS.md, "Pulling
 # fixes from ::gentoo"). Format: <category>/<package> <fingerprint>.
+# Every package kept in this overlay has a line. A package stock doesn't carry
+# is recorded as `-`; once stock gains it, the fingerprint changes and the
+# package gets checked (duplicate? still customized?).
 # Regenerate one entry with:
 #   cd $(portageq get_repo_path / gentoo)/<category>/<package> &&
 #   find . -type f ! -name Manifest | sort | xargs sha256sum | sha256sum | cut -c1-16
@@ -8,3 +11,7 @@ dev-perl/Mail-SPF 653dfc9523f130e5
 mail-mta/exim ea81980c73a3a537
 sys-apps/busybox f7d9e34ca35df97e
 www-apps/gitea 936a1c8a32212d86
+dev-util/diffr -
+sys-cluster/csync2 -
+www-apps/gitea-runner-bin -
+www-nginx/ngx-ja4 -

@@ -154,19 +154,24 @@ them — never invent one of those ourselves either.
 
 ### Pulling fixes from ::gentoo
 
-For every package that also exists in `::gentoo`, check what stock has
-fixed since our ebuild was last compared, and carry it over. Don't redo
-this on every pass: `stock-state.txt` at the repo root records a
-fingerprint of each stock package directory as of the last comparison.
+For every package in this overlay, check what stock has fixed since our
+ebuild was last compared, and carry it over. Don't redo this on every
+pass: `stock-state.txt` at the repo root records a fingerprint of each
+package's stock directory as of the last comparison, for every package we
+maintain. A package stock doesn't carry is recorded as `-`; when stock
+gains it the fingerprint changes and the package is checked like any
+other (a stock copy may make ours a duplicate, per "When a package no
+longer needs to live in this overlay").
 
 0. Compute the current fingerprint of stock's `<category>/<package>`
-   (command in the header of `stock-state.txt`). If it equals the recorded
+   (command in the header of `stock-state.txt`; `-` if the directory
+   doesn't exist). If it equals the recorded
    one, stock hasn't changed: skip the whole check below, including
    diffing and patch-applies. Otherwise do steps 1-4, then store the new
    fingerprint in `stock-state.txt` (in the same commit, or in its own
    `<category>/<package>: record stock state` commit when nothing needed
    porting). A package missing from `stock-state.txt` is checked once and
-   added. Also check when you touch the package for another reason
+   added; add a line for every new package with its fingerprint or `-`. Also check when you touch the package for another reason
    (a bump, a patch change).
 
 1. Diff our highest ebuild and its `files/` against stock's ebuild for

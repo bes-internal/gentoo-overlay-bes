@@ -128,7 +128,7 @@ changed ebuild in this pass, and name the file accordingly before running
 
 ## 5a. Pull fixes from ::gentoo
 
-For every package that also exists in `::gentoo`, first compare the
+For every package in the overlay (a package stock lacks is recorded as `-`), first compare the
 fingerprint of stock's package directory with the one in
 `stock-state.txt` (AGENTS.md, "Pulling fixes from ::gentoo", step 0). If
 equal, skip the package entirely: no diffs, no patch-apply or build
