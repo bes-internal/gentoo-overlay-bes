@@ -10,7 +10,7 @@
 dev-perl/Mail-SPF 653dfc9523f130e5
 mail-mta/exim ea81980c73a3a537
 sys-apps/busybox f7d9e34ca35df97e
-www-apps/gitea 936a1c8a32212d86
+www-apps/gitea 1e5cb7172b5e890f
 dev-util/diffr -
 sys-cluster/csync2 -
 www-apps/gitea-runner-bin -
