@@ -1,5 +1,5 @@
 ---
-name: overlay-check
+name: update
 description: Full maintenance pass over this repo — check every tracked package's upstream for a new version, bump/build/test/patch or drop it per AGENTS.md, keep README and -rN revisions correct, then commit and push. Use when asked to "check versions", "update the ebuilds", "run the overlay check", or do a routine maintenance pass on this overlay.
 ---
 
