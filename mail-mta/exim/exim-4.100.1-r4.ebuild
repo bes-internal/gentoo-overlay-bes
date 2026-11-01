@@ -113,9 +113,9 @@ src_prepare() {
 	eapply     "${FILESDIR}"/exim-4.99.3-as-needed-ldflags.patch # 352265, 391279
 	eapply -p0 "${FILESDIR}"/exim-4.76-crosscompile.patch # 266591
 	eapply     "${FILESDIR}"/exim-4.69-r1.27021.patch
-	eapply     "${FILESDIR}"/exim-4.97-localscan_dlopen.patch
+	eapply     "${FILESDIR}"/exim-4.100.1-localscan_dlopen.patch
 	eapply     "${FILESDIR}"/exim-4.97-no-exim_id_update.patch
-	eapply     "${FILESDIR}"/exim-4.100.1-miscmods-no-direct-ld.patch # 976375, 982617
+	eapply     "${FILESDIR}"/exim-4.100.1-miscmods-no-direct-ld.patch # 982617
 
 	if use maildir ; then
 		eapply "${FILESDIR}"/exim-4.94-maildir.patch
@@ -527,7 +527,7 @@ src_configure() {
 }
 
 src_compile() {
-	emake CC="$(tc-getCC)" HOSTCC="$(tc-getBUILD_CC)" \
+	emake CC="$(tc-getCC)" HOSTCC="$(tc-getBUILD_CC)" LD="$(tc-getLD)" \
 		AR="$(tc-getAR) cq" RANLIB="$(tc-getRANLIB)" FULLECHO=''
 }
 

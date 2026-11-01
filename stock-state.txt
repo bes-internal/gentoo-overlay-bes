@@ -8,7 +8,7 @@
 #   cd $(portageq get_repo_path / gentoo)/<category>/<package> &&
 #   find . -type f ! -name Manifest | sort | xargs sha256sum | sha256sum | cut -c1-16
 dev-perl/Mail-SPF 653dfc9523f130e5
-mail-mta/exim ea81980c73a3a537
+mail-mta/exim cec8c0cb1a2440a4
 sys-apps/busybox f7d9e34ca35df97e
 www-apps/gitea 1e5cb7172b5e890f
 dev-util/diffr -
