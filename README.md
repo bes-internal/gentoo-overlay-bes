@@ -32,9 +32,6 @@ What each package changes or adds relative to the main `::gentoo` tree.
   - `experimental_dmarc` USE flag: native DMARC (`EXPERIMENTAL_DMARC_NATIVE`, with PSL lookups)
   - patch: no direct `ld` for the dkim, dmarc and sieve_filter modules (bugs 976375, 982617); stock only patches dmarc and sieve_filter
   - keeps the `!dane? ( ssl? ( gnutls ) )` constraint (bug 925108) that stock's 4.100.1 ebuild dropped
-- www-apps/gitea
-  - newer upstream release than `::gentoo` (28.x)
-  - adapted to 28.x: `gitea.dev` module path in the `-X` ldflags, `USE=sqlite` selects the cgo `sqlite_mattn` driver, cgo enabled for `pam`/`sqlite`
 - sys-cluster/csync2 (not in `::gentoo`)
   - patch: abort on gnutls EAGAIN during large syncs
   - security patch: stack-use-after-scope in the pre-auth reply (LINBIT/csync2#49)
