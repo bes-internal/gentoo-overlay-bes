@@ -26,7 +26,7 @@ What each package changes or adds relative to the main `::gentoo` tree.
   - `+extra` USE flag: keeps the applets stock switches off (beep, inetd, ipcalc, inotifyd, rfkill, ...)
 - dev-perl/Mail-SPF
   - newer upstream (CPAN) release than `::gentoo`
-  - patch: CNAME lookup failure fix
+  - patch (3.2026.03.31 only): CNAME lookup failure fix; upstream dropped the CNAME check in 3.20261105
 - mail-mta/exim
   - `experimental_spf` USE flag: SPF via Perl Mail::SPF (`EXPERIMENTAL_SPF_PERL`) instead of libspf2
   - `experimental_dmarc` USE flag: native DMARC (`EXPERIMENTAL_DMARC_NATIVE`, with PSL lookups)
