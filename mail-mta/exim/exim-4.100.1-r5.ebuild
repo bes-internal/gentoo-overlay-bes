@@ -116,6 +116,10 @@ src_prepare() {
 	eapply     "${FILESDIR}"/exim-4.100.1-localscan_dlopen.patch
 	eapply     "${FILESDIR}"/exim-4.97-no-exim_id_update.patch
 	eapply     "${FILESDIR}"/exim-4.100.1-miscmods-no-direct-ld.patch # 982617
+	# Upstream bdc86cf9c (exim bug 3248): dns_nodata handling with SPF PERL.
+	# Adapted: DEBUG(dns_rr) does not exist in 4.100.1, use DEBUG(dns).
+	# Upstream paths are src/src/..., the release tarball root is src/, so -p2
+	use experimental_spf && eapply -p2 "${FILESDIR}"/exim-4.100.1-spf-perl-dns-nodata.patch
 
 	if use maildir ; then
 		eapply "${FILESDIR}"/exim-4.94-maildir.patch

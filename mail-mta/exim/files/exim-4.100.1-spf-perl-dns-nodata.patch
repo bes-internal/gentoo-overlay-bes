@@ -1,0 +1,213 @@
+From bdc86cf9c1b528909030f626b4d99fb6b4e9ff1f Mon Sep 17 00:00:00 2001
+From: Jeremy Harris <jgh146exb@wizmail.org>
+Date: Fri, 25 Sep 2026 00:38:58 +0100
+Subject: [PATCH] Fix dns_nodata handling for EXPERIMENTAL_SPF_PERL.  Bug 3248
+
+Related: fdf81beee5
+---
+ src/src/dns.c           | 134 ++++++++++++++++++++++++----------------
+ src/src/miscmods/perl.c |  14 +++--
+ 2 files changed, 90 insertions(+), 58 deletions(-)
+
+diff --git a/src/src/dns.c b/src/src/dns.c
+index 282cfcaac..ddf977bda 100644
+--- a/src/src/dns.c
++++ b/src/src/dns.c
+@@ -939,71 +939,97 @@ if (dnsa->answerlen > (int) sizeof(dnsa->answer))
+   dnsa->answerlen = sizeof(dnsa->answer);
+   }
+ 
+-if (dnsa->answerlen < 0) switch (h_errno)
++if (dnsa->answerlen < 0)
+   {
+-  case HOST_NOT_FOUND:
+-    DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave HOST_NOT_FOUND\n"
+-      "returning DNS_NOMATCH\n", name, dns_text_type(type));
+-    return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type), DNS_NOMATCH);
+-
+-  case TRY_AGAIN:
+-    DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave TRY_AGAIN\n",
+-      name, dns_text_type(type));
+-
+-    /* Cut this out for various test programs */
++  DEBUG(dns)
++    {
++    const uschar * rcodes[] = {
++      US"NOERROR", US"FORMERR", US"SERVFAIL", US"NXDOMAIN",
++      US"NOTIMP", US"REFUSED"
++    };
++    debug_printf_indent("DNS response header:");
++    debug_printf_indent("ID\t\t0x%04x\n", dnsa->answer[0]<<8 | dnsa->answer[1]);
++    debug_printf_indent("%s\n", dnsa->answer[2] & 0x80 ? "Response" : "Query");
++    if ((dnsa->answer[3] & 0xf) < nelem(rcodes))
++      debug_printf_indent("Rcode\t\t%s\n", rcodes[dnsa->answer[3] & 0xf]);
++    else
++      debug_printf_indent("Rcode\t\t%x\n", dnsa->answer[3] & 0xf);
++    debug_printf_indent("QDcount\t%d\n", dnsa->answer[4]<<8 | dnsa->answer[5]);
++    debug_printf_indent("ANcount\t%d\n", dnsa->answer[6]<<8 | dnsa->answer[7]);
++    debug_printf_indent("NScount\t%d\n", dnsa->answer[8]<<8 | dnsa->answer[9]);
++    debug_printf_indent("ARcount\t%d\n", dnsa->answer[10]<<8 |dnsa->answer[11]);
++    }
++  switch (h_errno)
++    {
++    case HOST_NOT_FOUND:
++      DEBUG(dns)
++	debug_printf_indent("DNS lookup of %s (%s) gave HOST_NOT_FOUND\n"
++	  "returning DNS_NOMATCH\n", name, dns_text_type(type));
++      return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type),
++			    DNS_NOMATCH);
++
++    case TRY_AGAIN:
++      DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave TRY_AGAIN\n",
++	name, dns_text_type(type));
++
++      /* Cut this out for various test programs */
+ #ifndef STAND_ALONE
+-    /* Permitting dns_again_means nonexist for TLSA lookups breaks the
+-    doewngrade resistance of dane, so avoid for those. */
++      /* Permitting dns_again_means nonexist for TLSA lookups breaks the
++      doewngrade resistance of dane, so avoid for those. */
+ 
+-    if (type == T_TLSA)
+-      rc = FAIL;
+-    else
+-      {
+-      if (try_again_recursion)
++      if (type == T_TLSA)
++	rc = FAIL;
++      else
+ 	{
+-	log_write(LOG_MAIN|LOG_PANIC,
+-	  "dns_again_means_nonexist recursion seen for %s"
+-	  " (assuming nonexist)", name);
+-	return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type),
+-			      DNS_NOMATCH);
+-	}
++	if (try_again_recursion)
++	  {
++	  log_write(LOG_MAIN|LOG_PANIC,
++	    "dns_again_means_nonexist recursion seen for %s"
++	    " (assuming nonexist)", name);
++	  return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type),
++				DNS_NOMATCH);
++	  }
+ 
+-      try_again_recursion = TRUE;
+-      save_domain = deliver_domain;
+-      deliver_domain = string_copy(name);  /* set $domain */
+-      rc = match_isinlist(name, CUSS &dns_again_means_nonexist, 0,
+-	&domainlist_anchor, NULL, MCL_DOMAIN, TRUE, NULL);
+-      deliver_domain = save_domain;
+-      try_again_recursion = FALSE;
+-      }
++	try_again_recursion = TRUE;
++	save_domain = deliver_domain;
++	deliver_domain = string_copy(name);  /* set $domain */
++	rc = match_isinlist(name, CUSS &dns_again_means_nonexist, 0,
++	  &domainlist_anchor, NULL, MCL_DOMAIN, TRUE, NULL);
++	deliver_domain = save_domain;
++	try_again_recursion = FALSE;
++	}
+ 
+-    if (rc != OK)
+-      {
+-      DEBUG(dns) debug_printf_indent("returning DNS_AGAIN\n");
+-      return dns_fail_return(name, type, 0, DNS_AGAIN);
+-      }
+-    DEBUG(dns) debug_printf_indent("%s is in dns_again_means_nonexist: returning "
+-      "DNS_NOMATCH\n", name);
+-    return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type), DNS_NOMATCH);
++      if (rc != OK)
++	{
++	DEBUG(dns) debug_printf_indent("returning DNS_AGAIN\n");
++	return dns_fail_return(name, type, 0, DNS_AGAIN);
++	}
++      DEBUG(dns)
++	debug_printf_indent("%s is in dns_again_means_nonexist: returning "
++			    "DNS_NOMATCH\n", name);
++      return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type),
++			    DNS_NOMATCH);
+ 
+ #else   /* For stand-alone tests */
+-    return dns_fail_return(name, type, 0, DNS_AGAIN);
++      return dns_fail_return(name, type, 0, DNS_AGAIN);
+ #endif
+ 
+-  case NO_RECOVERY:
+-    DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave NO_RECOVERY\n"
+-      "returning DNS_FAIL\n", name, dns_text_type(type));
+-    return dns_fail_return(name, type, 0, DNS_FAIL);
++    case NO_RECOVERY:
++      DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave NO_RECOVERY\n"
++	"returning DNS_FAIL\n", name, dns_text_type(type));
++      return dns_fail_return(name, type, 0, DNS_FAIL);
+ 
+-  case NO_DATA:
+-    DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave NO_DATA\n"
+-      "returning DNS_NODATA\n", name, dns_text_type(type));
+-    return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type), DNS_NODATA);
++    case NO_DATA:
++      DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave NO_DATA\n"
++	"returning DNS_NODATA\n", name, dns_text_type(type));
++      return dns_fail_return(name, type, dns_expire_from_soa(dnsa, type),
++			    DNS_NODATA);
+ 
+-  default:
+-    DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave unknown DNS error %d\n"
+-      "returning DNS_FAIL\n", name, dns_text_type(type), h_errno);
+-    return dns_fail_return(name, type, 0, DNS_FAIL);
++    default:
++      DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) gave unknown DNS error %d\n"
++	"returning DNS_FAIL\n", name, dns_text_type(type), h_errno);
++      return dns_fail_return(name, type, 0, DNS_FAIL);
++    }
+   }
+ 
+ DEBUG(dns) debug_printf_indent("DNS lookup of %s (%s) succeeded\n",
+@@ -1230,7 +1256,7 @@ not_good:
+       if (Ustrcmp(tp->drinst.name, transport_name) == 0)
+ 	{ s = tp->event_action; break; }
+ 
+-  if (s)
++  if (s && *s)
+     {
+     if (Ustrchr(name, ':'))	/* unlikely, but may as well bugproof */
+       {
+diff --git a/src/src/miscmods/perl.c b/src/src/miscmods/perl.c
+index 9f7b3ed3c..0c1c01baf 100644
+--- a/src/src/miscmods/perl.c
++++ b/src/src/miscmods/perl.c
+@@ -156,12 +156,18 @@ debug_printf_indent(" dnsa answer %p len %d\n", dnsa->answer, dnsa->answerlen);
+ */
+ 
+ ST(0) = sv_newmortal();
+-if (dns_res != DNS_SUCCEED)
+-  sv_setsv(ST(0), &PL_sv_undef);
+-else if (dnsa->answerlen == -1 && !fake_dnsa_len_for_fail(dnsa, rrtype_int))
++if (dns_res == DNS_AGAIN || dns_res == DNS_FAIL)
+   sv_setsv(ST(0), &PL_sv_undef);
+ else
++  {
++  if (dnsa->answerlen == -1)
++    {
++    memset(dnsa->answer, 0, 12);	/* zero the header */
++    dnsa->answer[2] = 0x80;		/* set the Reply bit */
++    dnsa->answerlen = 12;		/* claim header-only packet */
++    }
+   sv_setpvn(ST(0), CCS dnsa->answer, (STRLEN) dnsa->answerlen);
++  }
+ XSRETURN(1);	/* ? needed because there are 2 arg, but 1 res? */
+ 
+ store_free_dns_answer(dnsa);
+@@ -243,7 +249,7 @@ If a port was specified, we punt.
+ 	"$res = new Net::DNS::Packet(\\$dnsa) if (defined($dnsa));"
+ 
+ 	/*XXX dumb, but at least clears the undef on errorstring */
+-	"$self->errorstring(defined($dnsa) ? 'ok' : 'timeout');"
++	"$self->errorstring(defined($dnsa) ? 'ok' : 'no_dns_response');"
+ 
+ 	"return $res;"
+   "}"
+-- 
+2.53.0
+

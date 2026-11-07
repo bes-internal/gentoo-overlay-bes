@@ -30,7 +30,7 @@ What each package changes or adds relative to the main `::gentoo` tree.
 - mail-mta/exim
   - `experimental_spf` USE flag: SPF via Perl Mail::SPF (`EXPERIMENTAL_SPF_PERL`) instead of libspf2
   - `experimental_dmarc` USE flag: native DMARC (`EXPERIMENTAL_DMARC_NATIVE`, with PSL lookups)
-  - patch: no direct `ld` for the dkim, dmarc and sieve_filter modules (bugs 976375, 982617); stock only patches dmarc and sieve_filter
+  - patch (4.100.1, only with `experimental_spf`): upstream `bdc86cf9c` (bug 3248), `dns_nodata` handling for `EXPERIMENTAL_SPF_PERL` in `dns.c`/`perl.c`, backported (`DEBUG(dns_rr)` replaced by `DEBUG(dns)`)
   - keeps the `!dane? ( ssl? ( gnutls ) )` constraint (bug 925108) that stock's 4.100.1 ebuild dropped
 - sys-cluster/csync2 (not in `::gentoo`)
   - patch: abort on gnutls EAGAIN during large syncs
