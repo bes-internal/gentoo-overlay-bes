@@ -20,6 +20,7 @@ version-related breakage before committing.
 | sys-apps/busybox | `::gentoo` tree | Busybox's `X.Y.0` "unstable" releases usually land in stock without keywords (`KEYWORDS` commented out), so they're skipped by the rule below until stock keywords them. |
 | www-apps/gitea | https://github.com/go-gitea/gitea/releases.atom | GitHub Atom releases feed; tags are `v<version>`, skip `-dev`/`-rc` tags. After `1.27.x` upstream switched to major-only numbering (`v28.0.0`, `v28.1.0`, ...); Portage orders `28.x` above `1.27.x`. Base new versions on stock's ebuild. Since 28.x the Go module path is `gitea.dev` (the `-X ...modules/setting.*` ldflags must use it) and SQLite is built in via the pure-Go driver, with USE=sqlite selecting the cgo `sqlite_mattn` driver. |
 | www-apps/gitea-runner-bin | https://gitea.com/gitea/runner/releases.rss | Gitea instances expose `<releases-url>.rss` |
+| net-analyzer/fail2ban | https://github.com/fail2ban/fail2ban/releases.atom | GitHub Atom releases feed; tags are the bare version (`1.1.0`, no `v`), as in stock's `SRC_URI`. Not in the overlay: stock carries it, so when upstream gets ahead of stock's highest version, add an ebuild based on stock's. |
 | www-nginx/ngx-ja4 | https://github.com/bes-internal/ja4-nginx-module/releases.atom | Our own module repo; GitHub Atom releases feed, tags are `v<version>`. |
 
 A row whose feed is the `::gentoo` tree follows stock Gentoo's versions

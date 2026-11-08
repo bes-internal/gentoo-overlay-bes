@@ -15,3 +15,4 @@ dev-util/diffr -
 sys-cluster/csync2 -
 www-apps/gitea-runner-bin -
 www-nginx/ngx-ja4 -
+net-analyzer/fail2ban 798d90d30e36b05c
