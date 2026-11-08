@@ -38,7 +38,7 @@ What each package changes or adds relative to the main `::gentoo` tree.
   - patches: Apache log paths (`*error_log`/`*access_log`), systemd unit ordering before/after iptables save/restore (bug 871996), umask in tests
   - patch: OpenRC `supervise-daemon` as the default supervisor (upstream supports it only when `supervisor` is set)
   - no tmpfiles (1.1.1 uses `RuntimeDirectory`), installs the optional `fail2ban.socket` unit
-  - installs `paths-gentoo.conf` and points `jail.conf` at it: Debian's paths, but the sshd and postfix backends are `systemd` only with `USE=systemd`, otherwise `auto` (log files)
+  - `jail.conf` includes `paths-common.conf` instead of `paths-debian.conf`: no forced `systemd` backend for sshd/postfix (`auto`) and no Debian log paths or `banaction`; the admin sets those in `jail.local`
 - sys-cluster/csync2 (not in `::gentoo`)
   - patch: abort on gnutls EAGAIN during large syncs
   - security patch: stack-use-after-scope in the pre-auth reply (LINBIT/csync2#49)

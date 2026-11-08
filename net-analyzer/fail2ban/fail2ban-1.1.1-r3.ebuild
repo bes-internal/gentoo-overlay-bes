@@ -66,9 +66,10 @@ src_prepare() {
 	find . -mindepth 2 -type f -exec \
 		sed -i -e 's|/var\(/run/fail2ban\)|\1|g' {} + || die
 
-	# Use our paths-gentoo.conf (installed in src_install) instead of
-	# Debian's, which makes sshd and postfix read the systemd journal
-	sed -i -e 's|^before = paths-debian.conf|before = paths-gentoo.conf|' \
+	# Debian's paths-debian.conf (the upstream default) forces the systemd
+	# backend for sshd and postfix and assumes Debian log locations. Use the
+	# distribution-neutral paths-common.conf; log paths are up to the admin.
+	sed -i -e 's|^before = paths-debian.conf|before = paths-common.conf|' \
 		config/jail.conf || die
 }
 
@@ -110,20 +111,6 @@ src_install() {
 	# See http://thread.gmane.org/gmane.linux.gentoo.devel/35675
 	insinto /etc/logrotate.d
 	newins files/${PN}-logrotate ${PN}
-
-	# Upstream defaults to paths-debian.conf, which sets the sshd and
-	# postfix backends to systemd. That is only usable with USE=systemd
-	# (dev-python/python-systemd and a journal), otherwise read the log files.
-	insinto /etc/${PN}
-	newins - paths-gentoo.conf <<-EOF
-		# Gentoo: Debian's paths, but only use the systemd backend with USE=systemd
-		[INCLUDES]
-		before = paths-debian.conf
-
-		[DEFAULT]
-		sshd_backend = $(usex systemd systemd auto)
-		postfix_backend = $(usex systemd systemd auto)
-	EOF
 
 	keepdir /var/lib/${PN}
 
