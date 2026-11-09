@@ -31,13 +31,10 @@ What each package changes or adds relative to the main `::gentoo` tree.
   - `experimental_spf` USE flag: SPF via Perl Mail::SPF (`EXPERIMENTAL_SPF_PERL`) instead of libspf2
   - `experimental_dmarc` USE flag: native DMARC (`EXPERIMENTAL_DMARC_NATIVE`, with PSL lookups)
   - `exim-9999`: live ebuild from `code.exim.org/exim/exim.git` (default branch, currently `4.next`), no `KEYWORDS`: needs `mail-mta/exim **` in `package.accept_keywords`; no generated docs (man page, spec) and no PDF docs
-  - patch (4.100.1, only with `experimental_spf`): upstream `bdc86cf9c` (bug 3248), `dns_nodata` handling for `EXPERIMENTAL_SPF_PERL` in `dns.c`/`perl.c`, backported (`DEBUG(dns_rr)` replaced by `DEBUG(dns)`)
+  - patch (4.100.1, only with `experimental_spf`): fixes DNS "no data" answers (name exists, no record of the requested type) not being handled correctly in the DNS resolver and the embedded Perl interface used for SPF checks; backported from the upstream fix in the Exim git tree, not yet in a release
   - keeps the `!dane? ( ssl? ( gnutls ) )` constraint (bug 925108) that stock's 4.100.1 ebuild dropped
 - net-analyzer/fail2ban
   - newer upstream release than `::gentoo` (1.1.1)
-  - patches: Apache log paths (`*error_log`/`*access_log`), systemd unit ordering before/after iptables save/restore (bug 871996), umask in tests
-  - patch: OpenRC `supervise-daemon` as the default supervisor (upstream supports it only when `supervisor` is set)
-  - no tmpfiles (1.1.1 uses `RuntimeDirectory`), installs the optional `fail2ban.socket` unit
   - `jail.conf` includes `paths-common.conf` instead of `paths-debian.conf`: no forced `systemd` backend for sshd/postfix (`auto`) and no Debian log paths or `banaction`; the admin sets those in `jail.local`
 - sys-cluster/csync2 (not in `::gentoo`)
   - patch: abort on gnutls EAGAIN during large syncs
