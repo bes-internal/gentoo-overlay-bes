@@ -1,0 +1,16 @@
+# /etc/conf.d/restic-rest-server (OpenRC only; the systemd unit has its own
+# ExecStart, override it with `systemctl edit restic-rest-server`)
+
+# Arguments passed to rest-server (see `rest-server --help`).
+# By default the server asks for authentication, so create the password
+# file first (the path may be changed with --htpasswd-file):
+#   htpasswd -B -c /var/lib/restic-rest-server/.htpasswd <user>
+RESTSERVER_OPTS="--path /var/lib/restic-rest-server --listen 127.0.0.1:8000 --private-repos"
+
+# User and group to run as. Empty means root; the user needs write access
+# to the --path directory.
+#RESTSERVER_USER="restic"
+
+# Where the server's own stdout/stderr go.
+#RESTSERVER_OUTPUT_LOG="/var/log/restic-rest-server.log"
+#RESTSERVER_ERROR_LOG="/var/log/restic-rest-server.err"

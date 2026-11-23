@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+# Copyright 2026 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+name="Rest Server"
+description="REST server for restic backups"
+
+command="/usr/bin/rest-server"
+command_args="${RESTSERVER_OPTS}"
+command_user="${RESTSERVER_USER}"
+command_background="yes"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${RESTSERVER_OUTPUT_LOG:-/var/log/${RC_SVCNAME}.log}"
+error_log="${RESTSERVER_ERROR_LOG:-/var/log/${RC_SVCNAME}.err}"
+
+depend() {
+	need net
+}
