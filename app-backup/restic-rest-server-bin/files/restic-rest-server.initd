@@ -7,11 +7,15 @@ description="REST server for restic backups"
 
 command="/usr/bin/rest-server"
 command_args="${RESTSERVER_OPTS}"
-command_user="${RESTSERVER_USER}"
 command_background="yes"
 pidfile="/run/${RC_SVCNAME}.pid"
 output_log="${RESTSERVER_OUTPUT_LOG:-/var/log/${RC_SVCNAME}.log}"
 error_log="${RESTSERVER_ERROR_LOG:-/var/log/${RC_SVCNAME}.err}"
+
+# OpenRC adds --user even for an empty command_user, so only set it when needed
+if [ -n "${RESTSERVER_USER}" ]; then
+	command_user="${RESTSERVER_USER}"
+fi
 
 depend() {
 	need net
