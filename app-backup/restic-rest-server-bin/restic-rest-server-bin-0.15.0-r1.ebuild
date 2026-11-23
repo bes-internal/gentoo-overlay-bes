@@ -35,5 +35,8 @@ src_install() {
 	newconfd "${FILESDIR}"/restic-rest-server.confd restic-rest-server
 	systemd_newunit "${FILESDIR}"/restic-rest-server.service restic-rest-server.service
 
+	insinto /etc/logrotate.d
+	newins "${FILESDIR}"/restic-rest-server.logrotate restic-rest-server
+
 	keepdir /var/lib/restic-rest-server
 }
