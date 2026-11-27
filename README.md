@@ -31,8 +31,8 @@ What each package changes or adds relative to the main `::gentoo` tree.
   - `experimental_spf` USE flag: SPF via Perl Mail::SPF (`EXPERIMENTAL_SPF_PERL`) instead of libspf2
   - `experimental_dmarc` USE flag: native DMARC (`EXPERIMENTAL_DMARC_NATIVE`, with PSL lookups)
   - `exim-9999`: live ebuild from `code.exim.org/exim/exim.git` (default branch, currently `4.next`), no `KEYWORDS`: needs `mail-mta/exim **` in `package.accept_keywords`; no generated docs (man page, spec) and no PDF docs
-  - patch (4.100.1, only with `experimental_spf`): fixes DNS "no data" answers (name exists, no record of the requested type) not being handled correctly in the DNS resolver and the embedded Perl interface used for SPF checks; backported from the upstream fix in the Exim git tree, not yet in a release
-  - keeps the `!dane? ( ssl? ( gnutls ) )` constraint (bug 925108) that stock's 4.100.1 ebuild dropped
+  - patch (4.100.1 and 4.100.2, only with `experimental_spf`): fixes DNS "no data" answers (name exists, no record of the requested type) not being handled correctly in the DNS resolver and the embedded Perl interface used for SPF checks; backported from the upstream fix in the Exim git tree, not yet in a release
+  - keeps the `!dane? ( ssl? ( gnutls ) )` constraint (bug 925108) that stock's 4.100.x ebuilds dropped
 - net-analyzer/fail2ban
   - newer upstream release than `::gentoo` (1.1.1)
   - `jail.conf` includes `paths-common.conf` instead of `paths-debian.conf`: no forced `systemd` backend for sshd/postfix (`auto`) and no Debian log paths or `banaction`; the admin sets those in `jail.local`
